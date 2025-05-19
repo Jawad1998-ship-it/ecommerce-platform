@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  color-scheme: light;
+  -webkit-text-size-adjust: "100%";
+}
+
+.colorScheme {
+  color-scheme: light !important;
+  background-color: white !important;
+  color: black !important;
+}
+
+/* Light Theme */
+.light {
+  background-color: white;
+  color: black;
+}
+
+/* Dark Theme */
+.dark {
+  background-color: #222;
+  color: white;
+}
+
+html,
+body {
+  /* min-width: 600px;
+  width: 100vw;
+  min-height: 100vh; */
+  margin: 0;
+  padding: 0;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  text-size-adjust: 100%;
+}
+/* container */
+.mainContainer {
+  width: 100%;
+  min-height: 100%;
+  max-width: none;
+  min-width: 600px;
+  margin: 0 auto;
+}
+
+/* Navigation Styles */
+nav {
+  width: 100%;
+  min-width: 0;
+  -webkit-flex-shrink: 1;
+  -ms-flex-shrink: 1;
+  flex-shrink: 1;
+}
+
+@media (max-width: 320px) {
+  nav {
+    @apply min-w-0;
+    min-width: 0 !important;
+  }
+}
+
+/* Additional Mobile Safari Fixes */
+@supports (-webkit-touch-callout: none) {
+  html,
+  body {
+    height: -webkit-fill-available; /* Fix for iOS Safari height */
+  }
+
+  .container {
+    height: -webkit-fill-available;
+  }
+}
