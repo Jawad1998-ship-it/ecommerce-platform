@@ -134,10 +134,9 @@ const Home = () => {
     return quantity > 999 ? "999+" : quantity;
   };
 
-  console.log(cartItems);
   return (
     <div className={`min-h-screen ${theme === "dark" ? "dark" : ""}`}>
-      <main className="mainContainer mx-auto pt-10 pb-6 px-4 sm:pt-15 sm:pb-8 sm:px-6 lg:px-8">
+      <main className="mainContainer mx-auto pt-10 pb-6 sm:pt-15 sm:pb-8 px-6">
         <section className="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden mb-6 sm:mb-8">
           <div className="flex flex-col md:flex-row items-center justify-center">
             <div className="w-full text-center md:w-1/2 p-4 sm:p-6 md:p-8">
@@ -172,7 +171,7 @@ const Home = () => {
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6">
             Featured Products
           </h2>
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
             {products?.map((product) => (
               <Link
                 href={`/products/${product?.name?.toLowerCase()}/dp/${

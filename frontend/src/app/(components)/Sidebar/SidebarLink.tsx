@@ -22,44 +22,48 @@ export const SidebarLink = ({
     pathname === href || (pathname === "/" && href === "/dashboard");
 
   return (
-    <Link href={href}>
+    <Link href={href} passHref>
       <div
-        className={`cursor-pointer border-b border-b-gray-300 flex items-center ${
-          isCollapsed ? "justify-center py-4" : "justify-start px-8 py-4"
+        className={`cursor-pointer border-b border-b-gray-300 dark:border-b-gray-700 flex items-center ${
+          isCollapsed ? "justify-center py-4" : "justify-start px-6 py-4"
         } gap-3 transition-colors duration-200 ${
           theme === "dark"
             ? `${
                 isActive
                   ? "text-white bg-blue-600" // Active state in dark mode
-                  : "text-white hover:text-white hover:bg-blue-400" // Hover state in dark mode (unchanged)
+                  : "text-slate-300 hover:text-white hover:bg-blue-500/30" // Hover state in dark mode
               }`
             : `${
                 isActive
                   ? "text-gray-900 bg-blue-200" // Active state in light mode
-                  : "text-black hover:text-gray-800 hover:bg-blue-100" // Updated hover state in light mode
+                  : "text-slate-700 hover:text-gray-900 hover:bg-blue-100" // Hover state in light mode
               }`
         }`}
       >
         <Icon
-          className={`w-6 h-6 ${
-            theme === "dark"
-              ? isActive
+          className={`w-5 h-5 sm:w-6 sm:h-6 ${
+            // Responsive icon size
+            isActive
+              ? theme === "dark"
                 ? "text-white"
-                : "text-inherit"
-              : isActive
-              ? "text-gray-900"
-              : "text-inherit" // Inherits hover:text-gray-800 during hover
+                : "text-gray-900"
+              : theme === "dark"
+              ? "text-slate-400 group-hover:text-white"
+              : "text-slate-600 group-hover:text-gray-900" // Adjusted icon color for hover
           }`}
         />
         <span
-          className={`${isCollapsed ? "hidden" : "block"} font-medium ${
-            theme === "dark"
-              ? isActive
+          className={`${
+            isCollapsed ? "hidden" : "block"
+          } font-medium text-xs sm:text-sm md:text-base ${
+            // Responsive font sizes
+            isActive
+              ? theme === "dark"
                 ? "text-white"
-                : "text-inherit"
-              : isActive
-              ? "text-gray-900"
-              : "text-inherit" // Inherits hover:text-gray-800 during hover
+                : "text-gray-900"
+              : theme === "dark"
+              ? "text-inherit"
+              : "text-inherit"
           }`}
         >
           {label}
@@ -68,3 +72,5 @@ export const SidebarLink = ({
     </Link>
   );
 };
+
+export default SidebarLink; // Added default export for completeness if it's a standalone file

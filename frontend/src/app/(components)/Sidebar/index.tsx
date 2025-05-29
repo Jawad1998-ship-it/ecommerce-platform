@@ -11,6 +11,8 @@ import {
   ChevronsRight,
   ChevronsLeft,
   Package,
+  Building,
+  UserCog,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useState, useEffect } from "react";
@@ -57,7 +59,7 @@ const Sidebar = () => {
         {/* Logo Container with fixed height */}
         <div className="relative w-full flex items-center">
           <h1
-            className={`font-extrabold text-2xl break-all ${
+            className={`font-extrabold text-lg ps-6 break-all ${
               showLogo ? "block" : "hidden"
             }`}
           >
@@ -111,6 +113,12 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
+          href="/companies"
+          icon={Building}
+          label="Companies"
+          isCollapsed={isSidebarCollapsed}
+        />
+        <SidebarLink
           href="/payments"
           icon={CircleDollarSign}
           label="Payments"
@@ -123,7 +131,13 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/settings"
+          href="/dashboard/permissions"
+          icon={UserCog}
+          label="Role Permissions"
+          isCollapsed={isSidebarCollapsed}
+        />
+        <SidebarLink
+          href="/dashboard/settings"
           icon={SlidersHorizontal}
           label="Settings"
           isCollapsed={isSidebarCollapsed}

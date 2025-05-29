@@ -32,7 +32,12 @@ export const globalSlice = createSlice({
         state.cartItems[productId] = newQuantity;
       }
     },
-    setLoading(state, action: PayloadAction<boolean>) {
+    clearCartItem: (state, action: PayloadAction<number>) => {
+      const productId = action.payload;
+      const { [productId]: _, ...rest } = state.cartItems;
+      state.cartItems = rest;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
   },
@@ -43,6 +48,7 @@ export const {
   setCurrentUser,
   addToCart,
   removeFromCart,
+  clearCartItem,
   setLoading,
 } = globalSlice.actions;
 export default globalSlice.reducer;

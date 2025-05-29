@@ -10,6 +10,10 @@ const publicRoutes: string[] = [
   "/products/*",
   "/cart",
   "/signup/activation",
+  "/settings",
+  "/dashboard",
+  "/user/profile",
+  "/business",
 ];
 const roleRoutes: RoleRoutes = {
   admin: [...privateRoutes, ...publicRoutes],

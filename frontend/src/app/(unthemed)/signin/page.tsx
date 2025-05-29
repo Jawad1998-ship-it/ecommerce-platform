@@ -42,6 +42,8 @@ export default function Login() {
             dispatch(setCurrentUser(response?.data?.data?.user));
             if (response?.data?.data?.user?.role === "admin") {
               router.push("/dashboard");
+            } else if (response?.data?.data?.user?.role === "company") {
+              router.push("/business");
             } else if (response?.data?.data?.user?.role === "customer") {
               router.push("/home");
             }

@@ -18,13 +18,11 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col min-h-screen w-full min-w-[1200px] bg-gray-50 text-gray-900">
       <main
-        className={`${theme} flex flex-col h-full w-full ${
-          user?.role === "customer" ? "p-0" : "py-7 px-9"
-        } bg-gray-50`}
+        className={`${theme} flex flex-col h-full w-full bg-gray-50`}
       >
         <Navbar />
         <ToastContainer />
-        <div className="py-7 px-9 w-full">{children}</div>
+        <div className="w-full">{children}</div>
         <Footer />
       </main>
     </div>
