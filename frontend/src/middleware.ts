@@ -13,6 +13,7 @@ const publicRoutes: string[] = [
   "/settings",
   "/dashboard",
   "/user/profile",
+  "/user/settings",
   "/business",
 ];
 const roleRoutes: RoleRoutes = {

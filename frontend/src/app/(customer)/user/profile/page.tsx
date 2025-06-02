@@ -9,11 +9,13 @@ import { toast } from "react-toastify";
 import { AxiosResponse } from "axios";
 import Link from "next/link";
 import { Edit, Package, Settings, LogOut } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const ProfileSection = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { post } = useAxios();
+  const { theme } = useTheme(); // Provides "light" or "dark"
   const user = useAppSelector((state) => state.global.currentUser);
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +40,7 @@ const ProfileSection = () => {
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "light",
+          theme: theme, // Dynamically set toast theme
         });
         router.push("/signin");
         setTimeout(() => {
@@ -55,7 +57,7 @@ const ProfileSection = () => {
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "light",
+        theme: theme, // Dynamically set toast theme
         style: { width: "380px" },
       });
       setLoading(false);
@@ -63,14 +65,21 @@ const ProfileSection = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <div
+      className={`${theme} bg-white min-h-screen py-8 px-4 sm:px-6 lg:px-8`}
+    >
+      <div
+        // This is the main container card. Set its background distinct from the page.
+        className="bg-white dark:bg-gray-800 max-w-4xl mx-auto rounded-lg shadow-md p-6"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between border-b pb-4 mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Your Account</h1>
+        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            Your Account
+          </h1>
           <Link
             href="/user/edit-profile"
-            className="flex items-center text-blue-600 hover:text-blue-800"
+            className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             <Edit className="w-5 h-5 mr-2" />
             Edit Profile
@@ -80,39 +89,51 @@ const ProfileSection = () => {
         {/* User Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div>
-            <h2 className="text-lg font-medium text-gray-900">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
               Personal Information
             </h2>
             <div className="mt-4 space-y-2">
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Name:</span> {userInfo.name}
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  Name:
+                </span>{" "}
+                {userInfo.name}
               </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Email:</span> {userInfo.email}
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  Email:
+                </span>{" "}
+                {userInfo.email}
               </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Phone:</span> {userInfo.phone}
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  Phone:
+                </span>{" "}
+                {userInfo.phone}
               </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Address:</span> {userInfo.address}
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  Address:
+                </span>{" "}
+                {userInfo.address}
               </p>
             </div>
           </div>
           <div>
-            <h2 className="text-lg font-medium text-gray-900">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
               Account Actions
             </h2>
             <div className="mt-4 space-y-4">
               <Link
-                href="/cart"
-                className="flex items-center text-blue-600 hover:text-blue-800"
+                href="/cart" // Assuming this is for orders, adjust href if it's actually "cart"
+                className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 <Package className="w-5 h-5 mr-2" />
                 Your Orders
               </Link>
               <Link
                 href="/settings"
-                className="flex items-center text-blue-600 hover:text-blue-800"
+                className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 <Settings className="w-5 h-5 mr-2" />
                 Account Settings
@@ -120,7 +141,7 @@ const ProfileSection = () => {
               <button
                 onClick={handleLogout}
                 disabled={loading}
-                className="flex items-center text-red-600 hover:text-red-800 disabled:opacity-50"
+                className="flex items-center text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
               >
                 <LogOut className="w-5 h-5 mr-2" />
                 {loading ? "Logging out..." : "Sign Out"}
@@ -128,45 +149,6 @@ const ProfileSection = () => {
             </div>
           </div>
         </div>
-
-        {/* <div className="border-t pt-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">
-            More Options
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Link
-              href="/wishlist"
-              className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100"
-            >
-              <h3 className="text-sm fontCMS0.0pt;font-medium text-gray-900">
-                Your Wish List
-              </h3>
-              <p className="text-xs text-gray-600">
-                View and manage your saved items
-              </p>
-            </Link>
-            <Link
-              href="/payment-methods"
-              className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100"
-            >
-              <h3 className="text-sm font-medium text-gray-900">
-                Payment Methods
-              </h3>
-              <p className="text-xs text-gray-600">
-                Manage your saved payment methods
-              </p>
-            </Link>
-            <Link
-              href="/addresses"
-              className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100"
-            >
-              <h3 className="text-sm font-medium text-gray-900">Addresses</h3>
-              <p className="text-xs text-gray-600">
-                Manage your shipping addresses
-              </p>
-            </Link>
-          </div>
-        </div> */}
       </div>
     </div>
   );
