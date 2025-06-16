@@ -66,7 +66,6 @@ let fetchedInitialSettings: SystemSettingsData | null = null;
 
 const SystemSettingsPage: React.FC = () => {
   const [settings, setSettings] = useState<SystemSettingsData>(initialSettings);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -75,7 +74,6 @@ const SystemSettingsPage: React.FC = () => {
   const [favFile, setFavFile] = useState<File | null>(null);
 
   useEffect(() => {
-    setIsLoading(true);
     setTimeout(() => {
       const serverFetchedSettings: SystemSettingsData = {
         id: 1,
@@ -94,7 +92,6 @@ const SystemSettingsPage: React.FC = () => {
       };
       fetchedInitialSettings = { ...serverFetchedSettings };
       setSettings(serverFetchedSettings);
-      setIsLoading(false);
     }, 1000);
   }, []);
 
@@ -228,19 +225,6 @@ const SystemSettingsPage: React.FC = () => {
     //   // inputElement.focus(); // Example: manually focus if you want to conditionally
     // }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen p-4 bg-slate-50">
-        <div className="flex flex-col items-center">
-          <SlidersHorizontal className="h-12 w-12 text-sky-600 animate-spin" />
-          <p className="text-slate-700 text-lg">
-            Loading System Settings...
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const formFieldsConfig = [
     {
@@ -509,7 +493,7 @@ const SystemSettingsPage: React.FC = () => {
         <div className="md:col-span-2 pt-8 border-t border-slate-200 dark:border-slate-700 flex justify-end">
           <button
             type="submit"
-            disabled={isSaving || isLoading}
+            disabled={isSaving}
             className="w-auto flex items-center justify-center px-8 py-3 bg-sky-600 hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-600 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-800 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSaving ? (

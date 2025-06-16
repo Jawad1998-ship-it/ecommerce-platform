@@ -14,7 +14,7 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full max-w-2xl px-5">
       {user?.role === "customer" ? (
         <form
           onSubmit={handleSubmit}

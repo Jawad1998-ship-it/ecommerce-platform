@@ -242,13 +242,13 @@ const RolePermissionPage: React.FC = () => {
 
   return (
     // Main container: Applies base light theme styles and dark theme overrides
-    <div className="dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-800 p-2 font-sans text-slate-900 dark:text-slate-200">
+    <div className={`${theme} dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-800 p-2 font-sans text-slate-900 dark:text-slate-200`}>
       <div className="container mx-auto w-full">
         {/* Header */}
         <header className="mb-2 text-start">
           <h1
-            className="text-lg font-bold tracking-tight text-transparent bg-clip-text 
-           bg-gradient-to-r from-sky-500 to-blue-600 dark:from-sky-400 dark:to-blue-500 sm:text-xl"
+            className="text-lg font-bold tracking-tight bg-clip-text 
+           sm:text-xl"
           >
             User Role Settings
           </h1>
@@ -258,7 +258,7 @@ const RolePermissionPage: React.FC = () => {
         <div className="bg-white dark:bg-slate-800 shadow-xl dark:shadow-2xl rounded-xl p-4 mb-2 border border-slate-200 dark:border-slate-700">
           <label
             htmlFor="role-select"
-            className="block text-lg font-medium text-sky-600 dark:text-sky-400 mb-2"
+            className="block text-lg font-medium mb-2"
           >
             Select Role:
           </label>

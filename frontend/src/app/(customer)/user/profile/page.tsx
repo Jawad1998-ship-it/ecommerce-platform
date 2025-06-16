@@ -15,11 +15,10 @@ const ProfileSection = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { post } = useAxios();
-  const { theme } = useTheme(); // Provides "light" or "dark"
+  const { theme } = useTheme();
   const user = useAppSelector((state) => state.global.currentUser);
   const [loading, setLoading] = useState(false);
 
-  // Sample user data if not available (replace with actual user data)
   const userInfo = {
     name: user?.name || "John Doe",
     email: user?.email || "john.doe@example.com",
@@ -40,7 +39,7 @@ const ProfileSection = () => {
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: theme, // Dynamically set toast theme
+          theme: theme,
         });
         router.push("/signin");
         setTimeout(() => {
@@ -57,7 +56,7 @@ const ProfileSection = () => {
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: theme, // Dynamically set toast theme
+        theme: theme,
         style: { width: "380px" },
       });
       setLoading(false);
@@ -65,13 +64,8 @@ const ProfileSection = () => {
   };
 
   return (
-    <div
-      className={`${theme} bg-white min-h-screen py-8 px-4 sm:px-6 lg:px-8`}
-    >
-      <div
-        // This is the main container card. Set its background distinct from the page.
-        className="bg-white dark:bg-gray-800 max-w-4xl mx-auto rounded-lg shadow-md p-6"
-      >
+    <div className={`${theme} bg-white min-h-screen py-8 px-4 sm:px-6 lg:px-8`}>
+      <div className="bg-white dark:bg-gray-800 max-w-4xl mx-auto rounded-lg shadow-md p-6">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
@@ -125,7 +119,7 @@ const ProfileSection = () => {
             </h2>
             <div className="mt-4 space-y-4">
               <Link
-                href="/cart" // Assuming this is for orders, adjust href if it's actually "cart"
+                href="/cart"
                 className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 <Package className="w-5 h-5 mr-2" />

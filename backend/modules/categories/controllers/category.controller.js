@@ -4,29 +4,13 @@ import successResponse from "../../../utils/successResponse.js";
 import { redis } from "../../../lib/redis.js";
 import cloudinary from "../../../lib/cloudinary.js";
 
-const Product = db.model.Product;
+const Category = db.model.Category;
 
 export const createProduct = async (req, res) => {
   try {
-    const {
-      name,
-      description,
-      price,
-      brand,
-      color,
-      material,
-      compatibleDevices,
-      screenSize,
-      dimensions,
-      features,
-      imageFiles, // Now expects array of {url, publicId} objects
-      isInStock,
-      originalPrice,
-      batteryLife,
-      sensorType,
-      batteryDescription,
-    } = req.body;
-
+    const { cat_name, description, price, brand } = req.body;
+    console.log("this", req.body);
+    return;
     // Validation
     if (!name || !description || !price || !brand) {
       return errorResponse(

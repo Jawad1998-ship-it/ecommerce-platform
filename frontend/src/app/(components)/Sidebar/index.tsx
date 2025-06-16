@@ -13,6 +13,7 @@ import {
   Package,
   Building,
   UserCog,
+  Grid3X3,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useState, useEffect } from "react";
@@ -101,7 +102,13 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/products"
+          href="/admin/products/categories"
+          icon={Grid3X3}
+          label="Categories"
+          isCollapsed={isSidebarCollapsed}
+        />
+        <SidebarLink
+          href="/business/products"
           icon={Package}
           label="Products"
           isCollapsed={isSidebarCollapsed}
@@ -131,13 +138,13 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/dashboard/permissions"
+          href="/admin/permissions"
           icon={UserCog}
           label="Role Permissions"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/dashboard/settings"
+          href="/admin/settings"
           icon={SlidersHorizontal}
           label="Settings"
           isCollapsed={isSidebarCollapsed}

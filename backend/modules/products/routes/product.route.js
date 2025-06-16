@@ -3,6 +3,7 @@ import * as productController from "../controllers/product.controller.js";
 import userPhotoUploadMulter from "../../../middlewares/uploadUserPhoto.js";
 import {
   adminRoute,
+  companyRoute,
   protectedRoute,
   verifyToken,
 } from "../../../middlewares/authJwt.js";
@@ -12,7 +13,7 @@ const productRouter = express.Router();
 productRouter.post(
   "/create",
   protectedRoute,
-  adminRoute,
+  companyRoute,
   productController.createProduct
 );
 productRouter.get(
@@ -30,7 +31,7 @@ productRouter.get(
   productController.findAllRecommendedProducts
 );
 productRouter.get(
-  "/category/:category",
+  "/:category",
   verifyToken,
   productController.findProductsByCategory
 );

@@ -7,6 +7,10 @@ export interface AxiosContextReturn {
   loading: boolean;
 }
 
+export interface ProductImageUploaderProps {
+  isEditingForm: boolean;
+}
+
 export interface DecodedToken {
   userRole: string;
 }

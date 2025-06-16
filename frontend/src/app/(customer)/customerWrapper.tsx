@@ -22,7 +22,7 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
       >
         <Navbar />
         <ToastContainer />
-        <div className="w-full">{children}</div>
+        <div className="w-full px-6">{children}</div>
         <Footer />
       </main>
     </div>

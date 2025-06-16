@@ -1,4 +1,3 @@
-// src/app/(components)/ProductDetailsSection.tsx
 import React, { useState } from "react";
 import RatingPopup from "@/app/(components)/Rating";
 import { ProductDetailsSectionProps } from "@/types/types";
