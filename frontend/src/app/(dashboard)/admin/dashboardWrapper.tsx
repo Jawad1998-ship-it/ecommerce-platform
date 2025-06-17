@@ -31,7 +31,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <Navbar />
         </div>
         <ToastContainer />
-        <div className="p-2">{children}</div>
+        <div className="p-2 min-h-screen">{children}</div>
       </main>
     </div>
   );

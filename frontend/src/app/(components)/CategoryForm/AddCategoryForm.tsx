@@ -22,15 +22,14 @@ interface CategoryFormData {
   attributes: Attribute[];
 }
 
+// --- MODIFIED VALIDATION SCHEMA ---
 const validationSchema = Yup.object({
   name: Yup.string().required("Category name is required"),
   description: Yup.string().required("Description is required"),
   requiresApproval: Yup.boolean().required("Approval status is required"),
-  allowedUsers: Yup.array()
-    .of(
-      Yup.string().email("Invalid email address").required("Email is required")
-    )
-    .min(0, "At least one allowed user email is optional"),
+  allowedUsers: Yup.array().of(
+    Yup.string().email("Invalid email address").required("Email is required")
+  ),
   attributes: Yup.array()
     .of(
       Yup.object().shape({
@@ -49,7 +48,8 @@ const validationSchema = Yup.object({
           }),
       })
     )
-    .min(0, "At least one attribute is optional"),
+    // This line now requires at least one attribute to be added.
+    .min(1, "Please add at least one attribute."),
 });
 
 interface CategoryFormProps {
@@ -113,17 +113,34 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
 
   const renderError = (error: any) => {
     if (typeof error === "string") {
-      return error;
+      return <span>{error}</span>;
     }
     if (Array.isArray(error)) {
       return error.map((err, idx) => (
         <span key={idx}>
-          {typeof err === "string" ? err : JSON.stringify(err)}
+          {typeof err === "string"
+            ? err
+            : typeof err === "object" && err !== null
+            ? Object.values(err).map((value, i) => (
+                <span key={i}>
+                  {typeof value === "string" ? value : JSON.stringify(value)}
+                  <br />
+                </span>
+              ))
+            : JSON.stringify(err)}
           <br />
         </span>
       ));
     }
-    return JSON.stringify(error);
+    if (typeof error === "object" && error !== null) {
+      return Object.values(error).map((value, idx) => (
+        <span key={idx}>
+          {typeof value === "string" ? value : JSON.stringify(value)}
+          <br />
+        </span>
+      ));
+    }
+    return <span>{JSON.stringify(error)}</span>;
   };
 
   return (
@@ -131,11 +148,12 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
-      validateOnChange={false}
-      validateOnBlur={false}
+      validateOnChange={false} // Set to true to see errors as you type
+      validateOnBlur={true} // Set to true to see errors when you click away
     >
       {({ values, isSubmitting }) => (
         <Form className={`space-y-6 ${theme} p-4 rounded-lg shadow-lg`}>
+          {/* Category Name, Description, Requires Approval fields... */}
           <div className="space-y-2">
             <label htmlFor="name" className="block font-semibold text-sm">
               Category Name <span className="text-red-500">*</span>
@@ -240,15 +258,16 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                   </button>
                   <ErrorMessage
                     name="allowedUsers"
-                    render={renderError}
                     component="p"
                     className="text-red-500 text-xs"
+                    render={renderError}
                   />
                 </div>
               )}
             </FieldArray>
           </div>
 
+          {/* Category Attributes Section */}
           <div className="space-y-2">
             <label className="block font-semibold text-sm">
               Category Attributes (e.g., Color, Size, Model)
@@ -265,6 +284,7 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                           el)
                       }
                     >
+                      {/* Fields for each attribute... */}
                       <div className="space-y-2">
                         <label
                           htmlFor={`attributes[${index}].name`}
@@ -386,9 +406,9 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                                 </button>
                                 <ErrorMessage
                                   name={`attributes[${index}].options`}
-                                  render={renderError}
                                   component="p"
                                   className="text-red-500 text-xs"
+                                  render={renderError}
                                 />
                               </div>
                             )}
@@ -428,11 +448,14 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                   >
                     Add Attribute
                   </button>
+                  {/* This correctly displays the error below the button if no attributes are added */}
                   <ErrorMessage
                     name="attributes"
-                    render={renderError}
-                    component="p"
-                    className="text-red-500 text-xs"
+                    render={(msg) =>
+                      typeof msg === "string" ? (
+                        <p className="text-red-500 text-xs">{msg}</p>
+                      ) : null
+                    }
                   />
                 </div>
               )}
