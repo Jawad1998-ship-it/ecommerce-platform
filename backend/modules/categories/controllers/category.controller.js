@@ -6,85 +6,99 @@ import cloudinary from "../../../lib/cloudinary.js";
 
 const Category = db.model.Category;
 
-export const createProduct = async (req, res) => {
+export const createCategory = async (req, res) => {
   try {
-    const { cat_name, description, price, brand } = req.body;
-    console.log("this", req.body);
-    return;
-    // Validation
-    if (!name || !description || !price || !brand) {
-      return errorResponse(
-        400,
-        "VALIDATION_ERROR",
-        "Please provide all required fields: name, description, price, and brand.",
-        res
-      );
-    }
-
-    if (!imageFiles || imageFiles.length === 0) {
-      return errorResponse(
-        400,
-        "VALIDATION_ERROR",
-        "At least one product image is required.",
-        res
-      );
-    }
-
-    // Validate image data structure
-    const isValidImageData = imageFiles.every(
-      (img) => img.url && img.publicId && typeof img.url === "string"
-    );
-
-    if (!isValidImageData) {
-      return errorResponse(
-        400,
-        "VALIDATION_ERROR",
-        "Invalid image data format.",
-        res
-      );
-    }
-
-    // Extract image URLs for database storage
-    const imageUrls = imageFiles.map((img) => img.url);
-
-    const newProductData = {
+    const {
       name,
       description,
-      price: parseFloat(price),
-      brand,
-      color,
-      material,
-      compatibleDevices,
-      screenSize,
-      dimensions,
-      features: Array.isArray(features) ? features : [],
-      isInStock: Boolean(isInStock),
-      originalPrice: originalPrice ? parseFloat(originalPrice) : null,
-      batteryLife,
-      sensorType,
-      batteryDescription,
-      imageUrls,
-      // Store Cloudinary public IDs for future reference
-      cloudinaryPublicIds: imageFiles.map((img) => img.publicId),
+      requiresApproval,
+      allowedUsers,
+      attributes,
+    } = req.body;
+    console.log("Request body:", JSON.stringify(req.body, null, 2));
+    // Validation for required fields
+    if (!name || !description || !attributes) {
+      return errorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "Please provide required fields: category name, description and at least one attribute.",
+        res
+      );
+    }
+
+    // Validate attributes if provided
+    if (attributes && Array.isArray(attributes)) {
+      for (const attr of attributes) {
+        const { name, type, options } = attr;
+        if (!name || !type) {
+          return errorResponse(
+            400,
+            "VALIDATION_ERROR",
+            "All attributes must have a name and type.",
+            res
+          );
+        }
+        if (
+          type === "select" &&
+          (!options || !Array.isArray(options) || options.length === 0)
+        ) {
+          return errorResponse(
+            400,
+            "VALIDATION_ERROR",
+            `Options array cannot be empty for select type attribute: ${name}.`,
+            res
+          );
+        }
+      }
+    }
+
+    // Validate allowedUsers emails if provided
+    if (
+      allowedUsers &&
+      Array.isArray(allowedUsers) &&
+      allowedUsers.length > 0
+    ) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const invalidEmails = allowedUsers.filter(
+        (email) => !emailRegex.test(email)
+      );
+      if (invalidEmails.length > 0) {
+        return errorResponse(
+          400,
+          "VALIDATION_ERROR",
+          `Invalid email addresses: ${invalidEmails.join(", ")}.`,
+          res
+        );
+      }
+    }
+
+    // Prepare category data
+    const newCategoryData = {
+      name,
+      description,
+      requiresApproval: requiresApproval ?? true,
+      allowedUsers: allowedUsers || [],
+      attributes: attributes || [],
     };
 
-    const product = await Product.create(newProductData);
+    const category = await Category.create(newCategoryData);
 
     successResponse(
       201,
       "SUCCESS",
       {
-        product,
-        message: "Product created successfully",
+        category,
+        message: "Category created successfully",
       },
       res
     );
   } catch (err) {
-    console.error("Error creating product:", err);
+    console.error("Error creating category:", err);
     errorResponse(
       500,
       "SERVER_ERROR",
-      err.message || "An unexpected error occurred while creating the product.",
+      err.message ||
+        "An unexpected error occurred while creating the category.",
       res
     );
   }
@@ -377,14 +391,14 @@ export const getProduct = async (req, res) => {
   }
 };
 
-export const findAllProducts = async (req, res) => {
+export const findAllCategories = async (req, res) => {
   try {
-    const products = await Product.find({}); //find all products
+    const categories = await Category.find({});
     successResponse(
       200,
       "SUCCESS",
       {
-        products,
+        categories,
       },
       res
     );

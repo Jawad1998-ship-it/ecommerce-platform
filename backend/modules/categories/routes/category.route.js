@@ -14,13 +14,13 @@ categoryRouter.post(
   "/create",
   protectedRoute,
   companyRoute,
-  categoryController.createProduct
+  categoryController.createCategory
 );
 categoryRouter.get(
   "/all-categories",
   protectedRoute,
-  adminRoute,
-  categoryController.findAllProducts
+  companyRoute,
+  categoryController.findAllCategories
 );
 categoryRouter.get(
   "/:category",

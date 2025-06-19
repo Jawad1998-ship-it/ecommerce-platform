@@ -65,3 +65,32 @@ export interface InitialStateTypes {
   cartItems: { [productId: number]: number };
   loading: boolean;
 }
+
+export interface Attribute {
+  name: string;
+  type: "text" | "number" | "select";
+  required: boolean;
+  options?: string[];
+}
+
+export interface CategoryFormData {
+  name: string;
+  description: string;
+  requiresApproval: boolean;
+  allowedUsers: string[];
+  attributes: Attribute[];
+}
+
+export interface CategoryFormProps {
+  theme: string;
+}
+
+export interface CustomInputFieldProps {
+  name: string;
+  label: string;
+  type?: string;
+  as?: string;
+  placeholder?: string;
+  rows?: number;
+  required?: boolean;
+}

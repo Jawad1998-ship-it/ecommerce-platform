@@ -13,13 +13,30 @@ const AttributeSchema = new Schema({
   },
   required: {
     type: Boolean,
-    required: true,
+    required: false,
+  },
+  options: {
+    type: [String],
+    required: function () {
+      return this.type === "select";
+    },
+    validate: {
+      validator: function (options) {
+        return (
+          this.type !== "select" ||
+          (Array.isArray(options) && options.length > 0)
+        );
+      },
+      message:
+        "At least one option is required for attributes of type 'select'",
+    },
+    default: [],
   },
 });
 
 const CategorySchema = new Schema(
   {
-    cat_name: {
+    name: {
       type: String,
       required: true,
     },
@@ -27,9 +44,10 @@ const CategorySchema = new Schema(
       type: String,
       required: true,
     },
-    approval: {
-      type: String,
-      required: true,
+    requiresApproval: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     allowedUsers: {
       type: [String],
@@ -41,6 +59,10 @@ const CategorySchema = new Schema(
         },
         message: "All allowedUsers must be valid email addresses",
       },
+      default: [],
+    },
+    attributes: {
+      type: [AttributeSchema],
       default: [],
     },
   },

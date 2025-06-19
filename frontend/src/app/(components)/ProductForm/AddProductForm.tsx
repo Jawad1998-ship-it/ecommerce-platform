@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, FieldArray, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { NextRouter } from "next/router";
@@ -8,8 +8,22 @@ import ProductImageUpload from "../../(dashboard)/business/products/ProductImage
 import { toast } from "react-toastify";
 import useAxios from "@/context/axiosContext";
 
+interface Attribute {
+  name: string;
+  type: "text" | "number" | "select";
+  required: boolean;
+  options?: string[];
+}
+
+interface Category {
+  _id: string;
+  name: string;
+  attributes: Attribute[];
+}
+
 interface ProductFormData {
   id?: string;
+  category: string;
   name: string;
   description: string;
   price: number | string;
@@ -26,42 +40,8 @@ interface ProductFormData {
   features: string[];
   imageFiles: { file: File }[];
   isInStock: boolean;
+  attributes: { [key: string]: string | number };
 }
-
-const validationSchema = Yup.object({
-  name: Yup.string().required("Product name is required"),
-  description: Yup.string().required("Description is required"),
-  price: Yup.number()
-    .required("Price is required")
-    .positive("Price must be positive"),
-  originalPrice: Yup.number()
-    .positive("Original price must be positive")
-    .moreThan(
-      Yup.ref("price"),
-      "Original price must be greater than current price"
-    )
-    .nullable(),
-  brand: Yup.string().required("Brand is required"),
-  color: Yup.string().required("Color is required"),
-  material: Yup.string().required("Material is required"),
-  compatibleDevices: Yup.string().required("Compatible devices are required"),
-  screenSize: Yup.string().required("Screen size is required"),
-  dimensions: Yup.string().required("Dimensions are required"),
-  batteryLife: Yup.string().nullable(),
-  sensorType: Yup.string().nullable(),
-  batteryDescription: Yup.string().nullable(),
-  features: Yup.array()
-    .of(Yup.string().required("Feature cannot be empty"))
-    .min(1, "At least one feature is required"),
-  imageFiles: Yup.array()
-    .of(
-      Yup.object().shape({
-        file: Yup.mixed().required("Image file is required"),
-      })
-    )
-    .min(1, "At least one image is required"),
-  isInStock: Yup.boolean().required("Stock status is required"),
-});
 
 interface AddProductFormProps {
   theme: string;
@@ -69,9 +49,93 @@ interface AddProductFormProps {
 }
 
 const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
-  const { post, loading } = useAxios();
+  const { post, loading, get } = useAxios();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await get("/categories/all-categories");
+        console.log(response);
+        if (response?.status === 200) {
+          setCategories(response?.data?.data?.categories);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("Failed to load categories");
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Dynamic validation schema
+  const getValidationSchema = () => {
+    const schema = {
+      category: Yup.string().required("Category is required"),
+      name: Yup.string().required("Product name is required"),
+      description: Yup.string().required("Description is required"),
+      price: Yup.number()
+        .required("Price is required")
+        .positive("Price must be positive"),
+      originalPrice: Yup.number()
+        .positive("Original price must be positive")
+        .moreThan(
+          Yup.ref("price"),
+          "Original price must be greater than current price"
+        )
+        .nullable(),
+      brand: Yup.string().required("Brand is required"),
+      color: Yup.string().required("Color is required"),
+      material: Yup.string().required("Material is required"),
+      compatibleDevices: Yup.string().required(
+        "Compatible devices are required"
+      ),
+      screenSize: Yup.string().required("Screen size is required"),
+      dimensions: Yup.string().required("Dimensions are required"),
+      batteryLife: Yup.string().nullable(),
+      sensorType: Yup.string().nullable(),
+      batteryDescription: Yup.string().nullable(),
+      features: Yup.array()
+        .of(Yup.string().required("Feature cannot be empty"))
+        .min(1, "At least one feature is required"),
+      imageFiles: Yup.array()
+        .of(
+          Yup.object().shape({
+            file: Yup.mixed().required("Image file is required"),
+          })
+        )
+        .min(1, "At least one image is required"),
+      isInStock: Yup.boolean().required("Stock status is required"),
+      attributes: Yup.object().shape(
+        selectedCategory?.attributes.reduce((acc, attr) => {
+          if (attr.required) {
+            if (attr.type === "number") {
+              acc[attr.name] = Yup.number()
+                .required(`${attr.name} is required`)
+                .typeError(`${attr.name} must be a number`);
+            } else if (attr.type === "select") {
+              acc[attr.name] = Yup.string().required(
+                `${attr.name} is required`
+              );
+            } else {
+              acc[attr.name] = Yup.string().required(
+                `${attr.name} is required`
+              );
+            }
+          }
+          return acc;
+        }, {} as any) || {}
+      ),
+    };
+    return Yup.object(schema);
+  };
 
   const initialValues: ProductFormData = {
+    category: "",
     name: "",
     description: "",
     price: "",
@@ -88,6 +152,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     features: [""],
     imageFiles: [],
     isInStock: true,
+    attributes: {},
   };
 
   // Upload single file with progress
@@ -129,16 +194,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
   ) => {
     try {
       if (!values.imageFiles || values.imageFiles.length === 0) {
-        toast.error("Please upload at least one product image", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.error("Please upload at least one product image");
         return;
       }
 
@@ -160,16 +216,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         .map((result) => result.value);
 
       if (uploadedImages.length === 0) {
-        toast.error("Failed to upload images", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.error("Failed to upload images");
         return;
       }
 
@@ -181,21 +228,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
       const response = await post("/products/create", productData);
 
       if (response?.status === 201) {
-        toast.success("Product Created Successfully!", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-
-        // Redirect to products list after successful creation
-        // setTimeout(() => {
-        //   router.push("/products");
-        // }, 2000);
+        toast.success("Product Created Successfully!");
+        // router.push("/products");
       }
     } catch (error: any) {
       console.error("Error submitting form:", error);
@@ -204,26 +238,21 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         error?.response?.data?.message ||
         "An error occurred during product creation";
 
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        style: { width: "500px" },
-      });
+      toast.error(errorMessage);
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Utility function to capitalize first letter
+  const capitalize = (str: string) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={validationSchema}
+      validationSchema={getValidationSchema()}
       onSubmit={handleSubmit}
       validateOnChange={false}
       validateOnBlur={false}
@@ -231,6 +260,41 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
       {({ values, isSubmitting, setFieldValue }) => (
         <Form className={`space-y-6 ${theme} p-4 rounded-lg shadow-lg`}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                htmlFor="category"
+                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
+              >
+                Category <span className="text-red-500">*</span>
+              </label>
+              <Field
+                as="select"
+                name="category"
+                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  const categoryId = e.target.value;
+                  setFieldValue("category", categoryId);
+                  const selected = categories.find(
+                    (cat) => cat._id === categoryId
+                  );
+                  setSelectedCategory(selected || null);
+                  setFieldValue("attributes", {});
+                }}
+              >
+                <option value="">Select a category</option>
+                {categories?.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {capitalize(category.name)}
+                  </option>
+                ))}
+              </Field>
+              <ErrorMessage
+                name="category"
+                component="p"
+                className="text-red-500 text-xs mt-1"
+              />
+            </div>
+
             <div>
               <label
                 htmlFor="name"
@@ -313,165 +377,44 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="color"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
-                Color <span className="text-red-500">*</span>
-              </label>
-              <Field
-                type="text"
-                name="color"
-                placeholder="Enter color"
-                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
-              />
-              <ErrorMessage
-                name="color"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="material"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
-                Material <span className="text-red-500">*</span>
-              </label>
-              <Field
-                type="text"
-                name="material"
-                placeholder="Enter material"
-                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
-              />
-              <ErrorMessage
-                name="material"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="compatibleDevices"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
-                Compatible Devices <span className="text-red-500">*</span>
-              </label>
-              <Field
-                type="text"
-                name="compatibleDevices"
-                placeholder="Enter compatible devices"
-                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
-              />
-              <ErrorMessage
-                name="compatibleDevices"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="screenSize"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
-                Screen Size <span className="text-red-500">*</span>
-              </label>
-              <Field
-                type="text"
-                name="screenSize"
-                placeholder="Enter screen size"
-                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
-              />
-              <ErrorMessage
-                name="screenSize"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="dimensions"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
-                Dimensions <span className="text-red-500">*</span>
-              </label>
-              <Field
-                type="text"
-                name="dimensions"
-                placeholder="Enter dimensions"
-                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
-              />
-              <ErrorMessage
-                name="dimensions"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="batteryLife"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
-                Battery Life (Optional)
-              </label>
-              <Field
-                type="text"
-                name="batteryLife"
-                placeholder="Enter battery life"
-                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
-              />
-              <ErrorMessage
-                name="batteryLife"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="sensorType"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
-                Sensor Type (Optional)
-              </label>
-              <Field
-                type="text"
-                name="sensorType"
-                placeholder="Enter sensor type"
-                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
-              />
-              <ErrorMessage
-                name="sensorType"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="batteryDescription"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
-                Battery Description (Optional)
-              </label>
-              <Field
-                type="text"
-                name="batteryDescription"
-                placeholder="Enter battery description"
-                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
-              />
-              <ErrorMessage
-                name="batteryDescription"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
-            </div>
+            {/* Dynamic category attributes */}
+            {selectedCategory?.attributes?.map((attr, index) => (
+              <div key={index}>
+                <label
+                  htmlFor={`attributes[${index}].${attr.name}`}
+                  className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
+                >
+                  {capitalize(attr.name)}
+                  {attr.required && <span className="text-red-500">*</span>}
+                </label>
+                {attr.type === "select" ? (
+                  <Field
+                    as="select"
+                    name={`attributes[${attr.name}]`}
+                    className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors text-sm"
+                  >
+                    <option value="">Select {capitalize(attr.name)}</option>
+                    {attr.options?.map((option, idx) => (
+                      <option key={idx} value={option}>
+                        {capitalize(option)}
+                      </option>
+                    ))}
+                  </Field>
+                ) : (
+                  <Field
+                    type={attr.type}
+                    name={`attributes[${attr.name}]`}
+                    placeholder={`Enter ${capitalize(attr.name)}`}
+                    className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors text-sm"
+                  />
+                )}
+                <ErrorMessage
+                  name={`attributes[${attr.name}]`}
+                  component="p"
+                  className="text-red-500 text-xs mt-1"
+                />
+              </div>
+            ))}
           </div>
 
           <div>

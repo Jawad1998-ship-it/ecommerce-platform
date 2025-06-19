@@ -6,30 +6,13 @@ import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import useAxios from "@/context/axiosContext";
+import { CategoryFormData, CategoryFormProps } from "@/types/types";
 
-interface Attribute {
-  name: string;
-  type: "text" | "number" | "select";
-  required: boolean;
-  options?: string[];
-}
-
-interface CategoryFormData {
-  name: string;
-  description: string;
-  requiresApproval: boolean;
-  allowedUsers: string[];
-  attributes: Attribute[];
-}
-
-// --- MODIFIED VALIDATION SCHEMA ---
 const validationSchema = Yup.object({
   name: Yup.string().required("Category name is required"),
   description: Yup.string().required("Description is required"),
   requiresApproval: Yup.boolean().required("Approval status is required"),
-  allowedUsers: Yup.array().of(
-    Yup.string().email("Invalid email address").required("Email is required")
-  ),
+  allowedUsers: Yup.array().of(Yup.string().email("Invalid email address")),
   attributes: Yup.array()
     .of(
       Yup.object().shape({
@@ -51,10 +34,6 @@ const validationSchema = Yup.object({
     // This line now requires at least one attribute to be added.
     .min(1, "Please add at least one attribute."),
 });
-
-interface CategoryFormProps {
-  theme: string;
-}
 
 const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
   const router = useRouter();
@@ -111,49 +90,16 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
     }
   };
 
-  const renderError = (error: any) => {
-    if (typeof error === "string") {
-      return <span>{error}</span>;
-    }
-    if (Array.isArray(error)) {
-      return error.map((err, idx) => (
-        <span key={idx}>
-          {typeof err === "string"
-            ? err
-            : typeof err === "object" && err !== null
-            ? Object.values(err).map((value, i) => (
-                <span key={i}>
-                  {typeof value === "string" ? value : JSON.stringify(value)}
-                  <br />
-                </span>
-              ))
-            : JSON.stringify(err)}
-          <br />
-        </span>
-      ));
-    }
-    if (typeof error === "object" && error !== null) {
-      return Object.values(error).map((value, idx) => (
-        <span key={idx}>
-          {typeof value === "string" ? value : JSON.stringify(value)}
-          <br />
-        </span>
-      ));
-    }
-    return <span>{JSON.stringify(error)}</span>;
-  };
-
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
-      validateOnChange={false} // Set to true to see errors as you type
-      validateOnBlur={true} // Set to true to see errors when you click away
+      validateOnChange={false}
+      validateOnBlur={true}
     >
       {({ values, isSubmitting }) => (
         <Form className={`space-y-6 ${theme} p-4 rounded-lg shadow-lg`}>
-          {/* Category Name, Description, Requires Approval fields... */}
           <div className="space-y-2">
             <label htmlFor="name" className="block font-semibold text-sm">
               Category Name <span className="text-red-500">*</span>
@@ -256,12 +202,6 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                   >
                     Add User Email
                   </button>
-                  <ErrorMessage
-                    name="allowedUsers"
-                    component="p"
-                    className="text-red-500 text-xs"
-                    render={renderError}
-                  />
                 </div>
               )}
             </FieldArray>
@@ -270,7 +210,8 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
           {/* Category Attributes Section */}
           <div className="space-y-2">
             <label className="block font-semibold text-sm">
-              Category Attributes (e.g., Color, Size, Model)
+              Category Attributes (e.g., Color, Size, Model){" "}
+              <span className="text-red-500">*</span>
             </label>
             <FieldArray name="attributes">
               {({ push, remove }) => (
@@ -284,7 +225,6 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                           el)
                       }
                     >
-                      {/* Fields for each attribute... */}
                       <div className="space-y-2">
                         <label
                           htmlFor={`attributes[${index}].name`}
@@ -357,29 +297,35 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                               <div className="space-y-3">
                                 {(attribute.options || []).map(
                                   (_, optIndex) => (
-                                    <div
-                                      key={optIndex}
-                                      className="flex items-center space-x-3 group w-full"
-                                      ref={(el) => {
-                                        if (!optionRefs.current[index]) {
-                                          optionRefs.current[index] = [];
-                                        }
-                                        optionRefs.current[index][optIndex] =
-                                          el;
-                                      }}
-                                    >
-                                      <Field
-                                        name={`attributes[${index}].options[${optIndex}]`}
-                                        placeholder={`Option ${optIndex + 1}`}
-                                        className="flex-1 px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:focus:ring-sky-400 dark:focus:border-sky-400 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => removeOption(optIndex)}
-                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 text-sm font-semibold"
+                                    <div key={optIndex}>
+                                      <div
+                                        className="flex items-center space-x-3 group w-full"
+                                        ref={(el) => {
+                                          if (!optionRefs.current[index]) {
+                                            optionRefs.current[index] = [];
+                                          }
+                                          optionRefs.current[index][optIndex] =
+                                            el;
+                                        }}
                                       >
-                                        Remove
-                                      </button>
+                                        <Field
+                                          name={`attributes[${index}].options[${optIndex}]`}
+                                          placeholder={`Option ${optIndex + 1}`}
+                                          className="flex-1 px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:focus:ring-sky-400 dark:focus:border-sky-400 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => removeOption(optIndex)}
+                                          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 text-sm font-semibold"
+                                        >
+                                          Remove
+                                        </button>
+                                      </div>
+                                      <ErrorMessage
+                                        name={`attributes[${index}].options[${optIndex}]`}
+                                        component="p"
+                                        className="text-red-500 text-xs mt-1"
+                                      />
                                     </div>
                                   )
                                 )}
@@ -387,18 +333,6 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                                   type="button"
                                   onClick={() => {
                                     pushOption("");
-                                    setTimeout(() => {
-                                      const newOptIndex = (
-                                        attribute.options || []
-                                      ).length;
-                                      optionRefs.current[index]?.[
-                                        newOptIndex
-                                      ]?.scrollIntoView({
-                                        behavior: "smooth",
-                                        block: "start",
-                                        inline: "nearest",
-                                      });
-                                    }, 0);
                                   }}
                                   className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all duration-200 text-sm font-semibold"
                                 >
@@ -406,9 +340,13 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                                 </button>
                                 <ErrorMessage
                                   name={`attributes[${index}].options`}
-                                  component="p"
-                                  className="text-red-500 text-xs"
-                                  render={renderError}
+                                  render={(msg) =>
+                                    typeof msg === "string" ? (
+                                      <p className="text-red-500 text-xs">
+                                        {msg}
+                                      </p>
+                                    ) : null
+                                  }
                                 />
                               </div>
                             )}
@@ -448,7 +386,6 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                   >
                     Add Attribute
                   </button>
-                  {/* This correctly displays the error below the button if no attributes are added */}
                   <ErrorMessage
                     name="attributes"
                     render={(msg) =>
