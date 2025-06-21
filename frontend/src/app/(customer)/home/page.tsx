@@ -195,7 +195,7 @@ const Home = () => {
                     <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4">
                       ${product?.price?.toFixed(2)}
                     </p>
-                    {cartItems[product?.id] ? (
+                    {cartItems && cartItems[product?.id] ? (
                       <div className="flex items-center justify-between px-1 border rounded-lg overflow-hidden">
                         <button
                           onClick={(e) => {

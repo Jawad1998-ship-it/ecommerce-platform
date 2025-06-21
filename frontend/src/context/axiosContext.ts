@@ -2,14 +2,11 @@
 
 import axios from "axios";
 import { useState, useCallback } from "react";
-// import { getCookie, setCookie } from "cookies-next/client";
 
 const useAxios = () => {
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
   if (!baseURL) {
-    console.error(
-      "NEXT_PUBLIC_API_BASE_URL is not defined. Please check your .env.local file."
-    );
+    console.error("BASE URL is not defined. Please check your host.");
   }
 
   const [loading, setLoading] = useState(false);
@@ -29,7 +26,13 @@ const useAxios = () => {
     (response) => response, // Pass through successful responses
     async (error) => {
       const originalRequest = error.config;
-
+      // Exclude /login and /register from token refresh logic
+      // if (
+      //   originalRequest.url === "/login" ||
+      //   originalRequest.url === "/register"
+      // ) {
+      //   return Promise.reject(error);
+      // }
       // Check if the error is a 401 and the request hasn't been retried yet
       if (
         error.response?.status === 401 &&

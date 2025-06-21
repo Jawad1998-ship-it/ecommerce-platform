@@ -6,7 +6,7 @@ export const configureCors = (app) => {
     credentials: true, // Access-Control-Allow-Credentials: true
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    optionSuccessStatus: 200, // Ensures success status 200 for some legacy browsers
+    optionsSuccessStatus: 200, // Ensures success status 200 for some legacy browsers
   };
 
   app.use(cors(corsOptions)); // Applying CORS middleware with the defined options

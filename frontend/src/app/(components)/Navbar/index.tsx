@@ -26,10 +26,9 @@ const Navbar = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { post } = useAxios();
   const cartItems = useAppSelector((state) => state.global.cartItems);
-  const cartItemsCount = Object?.values(cartItems)?.reduce(
-    (total, quantity) => total + quantity,
-    0
-  );
+  const cartItemsCount =
+    cartItems &&
+    Object?.values(cartItems)?.reduce((total, quantity) => total + quantity, 0);
 
   const toggleDropdown = (): void => {
     setIsDropdownOpen(!isDropdownOpen);
