@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import { useAppSelector, useAppDispatch } from "@/app/redux";
 import { addToCart, removeFromCart, clearCartItem } from "@/app/state";
 import { Plus, Minus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Product data (same as provided)
 const products = [
@@ -109,7 +110,6 @@ const products = [
 
 const CartItem = ({ item, onUpdateQuantity }) => {
   const dispatch = useAppDispatch();
-
   const handleQuantityChange = (e) => {
     const newQuantity = parseInt(e.target.value);
     if (newQuantity >= 1) {
@@ -254,12 +254,11 @@ const CartPage = () => {
                 <span>Total</span>
                 <span>${subtotal?.toFixed(2)}</span>
               </div>
-              <button
-                className="w-full mt-3 sm:mt-4 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black py-2 sm:py-3 rounded-lg transition-colors text-sm sm:text-base font-medium"
-                onClick={() => alert("Proceeding to checkout...")}
-              >
-                Proceed to Checkout
-              </button>
+              <Link href="/order-details">
+                <button className="w-full mt-3 sm:mt-4 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black py-2 sm:py-3 rounded-lg transition-colors text-sm sm:text-base font-medium">
+                  Proceed to Checkout
+                </button>
+              </Link>
             </div>
           </div>
         )}

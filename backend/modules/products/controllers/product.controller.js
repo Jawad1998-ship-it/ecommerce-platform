@@ -9,30 +9,24 @@ const Product = db.model.Product;
 export const createProduct = async (req, res) => {
   try {
     const {
+      category,
       name,
       description,
       price,
-      brand,
-      color,
-      material,
-      compatibleDevices,
-      screenSize,
-      dimensions,
-      features,
-      imageFiles, // Now expects array of {url, publicId} objects
-      isInStock,
       originalPrice,
-      batteryLife,
-      sensorType,
-      batteryDescription,
+      brand,
+      attributes,
+      features,
+      imageFiles,
+      isInStock,
     } = req.body;
 
     // Validation
-    if (!name || !description || !price || !brand) {
+    if (!name || !description || !price || !brand || !category || !features) {
       return errorResponse(
         400,
         "VALIDATION_ERROR",
-        "Please provide all required fields: name, description, price, and brand.",
+        "Please provide all required fields: name, description, price, brand, category, and features.",
         res
       );
     }
@@ -60,27 +54,50 @@ export const createProduct = async (req, res) => {
       );
     }
 
+    // Validate attributes
+    if (
+      !attributes ||
+      typeof attributes !== "object" ||
+      Object.keys(attributes).length === 0
+    ) {
+      return errorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "Attributes must be a non-empty object.",
+        res
+      );
+    }
+
+    // Validate attribute values
+    const isValidAttributes = Object.values(attributes).every((value) =>
+      Array.isArray(value)
+        ? value.every((item) => typeof item === "string")
+        : typeof value === "string"
+    );
+
+    if (!isValidAttributes) {
+      return errorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "Attribute values must be strings or arrays of strings.",
+        res
+      );
+    }
+
     // Extract image URLs for database storage
     const imageUrls = imageFiles.map((img) => img.url);
 
     const newProductData = {
+      category,
       name,
       description,
       price: parseFloat(price),
+      originalPrice: originalPrice ? parseFloat(originalPrice) : null,
       brand,
-      color,
-      material,
-      compatibleDevices,
-      screenSize,
-      dimensions,
+      attributes, // Now stored as a Map
       features: Array.isArray(features) ? features : [],
       isInStock: Boolean(isInStock),
-      originalPrice: originalPrice ? parseFloat(originalPrice) : null,
-      batteryLife,
-      sensorType,
-      batteryDescription,
       imageUrls,
-      // Store Cloudinary public IDs for future reference
       cloudinaryPublicIds: imageFiles.map((img) => img.publicId),
     };
 
@@ -395,7 +412,7 @@ export const getProduct = async (req, res) => {
 
 export const findAllProducts = async (req, res) => {
   try {
-    const products = await Product.find({}); //find all products
+    const products = await Product.find({});
     successResponse(
       200,
       "SUCCESS",

@@ -19,13 +19,7 @@ const Register = () => {
       {isLoading ? (
         <Loading />
       ) : (
-        <div className="w-full flex flex-col flex-wrap h-screen items-center justify-center">
-          <div className="w-full flex flex-col items-center text-center p-2">
-            <h1 className="text-4xl font-bold text-blue-800">PayGuard</h1>
-            <p className="text-gray-700 text-md font-medium">
-              Your trusted platform for secure payments.
-            </p>
-          </div>
+        <div className="bg-gray-100 w-full flex flex-col flex-wrap h-screen items-center justify-center">
           <div className="w-[400px] mb-3">
             <div className="bg-white shadow-lg rounded-xl p-4 space-y-3 mx-auto border border-gray-300">
               <h2 className="text-2xl font-semibold text-gray-800 text-center">

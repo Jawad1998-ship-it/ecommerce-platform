@@ -12,7 +12,20 @@ const validationSchema = Yup.object({
   name: Yup.string().required("Category name is required"),
   description: Yup.string().required("Description is required"),
   requiresApproval: Yup.boolean().required("Approval status is required"),
-  allowedUsers: Yup.array().of(Yup.string().email("Invalid email address")),
+  allowedUsers: Yup.array().of(
+    Yup.string().test(
+      "is-email-or-empty",
+      "Invalid email address",
+      function (value) {
+        // If empty or whitespace only, it's valid (ignore it)
+        if (!value || value.trim() === "") {
+          return true;
+        }
+        // Otherwise, must be a valid email
+        return Yup.string().email().isValidSync(value);
+      }
+    )
+  ),
   attributes: Yup.array()
     .of(
       Yup.object().shape({
@@ -31,7 +44,6 @@ const validationSchema = Yup.object({
           }),
       })
     )
-    // This line now requires at least one attribute to be added.
     .min(1, "Please add at least one attribute."),
 });
 

@@ -67,7 +67,7 @@ export default function Login() {
 
   return (
     <>
-      <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br p-4">
+      <div className="bg-gray-100 w-full min-h-screen flex items-center justify-center bg-gradient-to-br p-4">
         <ToastContainer />
         <div className="w-[400px] mx-auto px-4">
           <div className="bg-white p-6 rounded-lg shadow-lg">

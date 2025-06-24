@@ -18,8 +18,8 @@ productRouter.post(
 );
 productRouter.get(
   "/all-products",
-  protectedRoute,
-  adminRoute,
+  // protectedRoute,
+  // companyRoute,
   productController.findAllProducts
 );
 productRouter.get(

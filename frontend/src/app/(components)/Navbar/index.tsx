@@ -53,7 +53,7 @@ const Navbar = () => {
         setTimeout(() => {
           dispatch(setCurrentUser(null));
           setLoading(false);
-        }, 500);
+        }, 800);
       }
     } catch (error: any) {
       toast.error(error?.response?.data?.data?.error || "An error occurred", {
@@ -101,10 +101,7 @@ const Navbar = () => {
           <div className={`w-full flex items-center justify-between mx-auto`}>
             {user?.role !== "admin" && (
               <div className="flex items-center justify-center space-x-3 flex-shrink-0 pe-4">
-                <Link
-                  href="https://flowbite.com/"
-                  className="flex items-center space-x-2"
-                >
+                <Link href="/home" className="flex items-center space-x-2">
                   <Image
                     src="https://flowbite.com/docs/images/logo.svg"
                     className="h-8"
@@ -132,27 +129,26 @@ const Navbar = () => {
                 user?.role !== "customer" ? "justify-between" : "justify-end"
               }  gap-1 flex-shrink-0`}
             >
-              <div className="flex items-center gap-4 flex-shrink-0">
+              <div className="flex items-center gap-7 flex-shrink-0">
                 <button className="p-0 border-none bg-transparent outline-none flex-shrink-0">
                   <ThemeSwitcher />
                 </button>
                 <div className="relative flex-shrink-0">
-                  {user &&
-                    (user?.role === "customer" ? (
-                      <Link href="/cart">
-                        <ShoppingCart
-                          className="cursor-pointer w-6 h-6"
-                          size={24}
-                        />
-                      </Link>
-                    ) : (
-                      <Bell className="cursor-pointer w-6 h-6" size={24} />
-                    ))}
+                  {user?.role === "customer" || !user ? (
+                    <Link href="/cart">
+                      <ShoppingCart
+                        className="cursor-pointer w-6 h-6"
+                        size={24}
+                      />
+                    </Link>
+                  ) : (
+                    <Bell className="cursor-pointer w-6 h-6" size={24} />
+                  )}
 
-                  {user?.role === "customer" ? (
+                  {user?.role === "customer" || !user ? (
                     <Link href="/cart">
                       <span className="absolute -top-3 -right-3 min-w-[1.25rem] h-5 px-1 text-xs font-semibold text-white bg-red-500 rounded-full flex items-center justify-center leading-none">
-                        {user?.role === "customer"
+                        {user?.role === "customer" || !user
                           ? cartItemsCount > 99
                             ? "99+"
                             : cartItemsCount

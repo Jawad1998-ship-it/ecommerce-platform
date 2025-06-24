@@ -3,6 +3,10 @@ const { Schema } = mongoose;
 
 const ProductSchema = new Schema(
   {
+    category: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -23,38 +27,28 @@ const ProductSchema = new Schema(
       type: String,
       required: true,
     },
-    color: {
-      type: String,
+    attributes: {
+      type: Map,
+      of: Schema.Types.Mixed,
       required: true,
-    },
-    material: {
-      type: String,
-      required: true,
-    },
-    compatibleDevices: {
-      type: String,
-      required: true,
-    },
-    screenSize: {
-      type: String,
-      required: true,
-    },
-    dimensions: {
-      type: String,
-      required: true,
-    },
-    batteryLife: {
-      type: String,
-    },
-    sensorType: {
-      type: String,
-    },
-    batteryDescription: {
-      type: String,
+      validate: {
+        validator: function (value) {
+          if (value.size === 0) return false;
+          for (const val of value.values()) {
+            if (Array.isArray(val)) {
+              return val.every((item) => typeof item === "string");
+            }
+            return typeof val === "string";
+          }
+          return true;
+        },
+        message:
+          "Attributes must be a non-empty map with string or string array values",
+      },
     },
     features: {
       type: [String],
-      default: [],
+      required: true,
     },
     imageUrls: {
       type: [String],
@@ -63,6 +57,9 @@ const ProductSchema = new Schema(
     isInStock: {
       type: Boolean,
       default: true,
+    },
+    cloudinaryPublicIds: {
+      type: [String],
     },
   },
   {

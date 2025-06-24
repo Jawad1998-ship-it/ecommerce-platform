@@ -80,7 +80,7 @@ export const protectedRoute = async (req, res, next) => {
       }
       throw error;
     }
-  } catch (error) {
+  } catch (err) {
     errorResponse(
       500,
       "ERROR",

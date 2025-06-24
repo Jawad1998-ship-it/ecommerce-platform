@@ -6,7 +6,8 @@ import * as Yup from "yup";
 import { NextRouter } from "next/router";
 import ProductImageUpload from "../../(dashboard)/business/products/ProductImageUpload";
 import { toast } from "react-toastify";
-import useAxios from "@/context/axiosContext";
+import useAxios from "../../../context/axiosContext";
+import Select from "react-select";
 
 interface Attribute {
   name: string;
@@ -29,18 +30,10 @@ interface ProductFormData {
   price: number | string;
   originalPrice?: number | string;
   brand: string;
-  color: string;
-  material: string;
-  compatibleDevices: string;
-  screenSize: string;
-  dimensions: string;
-  batteryLife?: string;
-  sensorType?: string;
-  batteryDescription?: string;
   features: string[];
   imageFiles: { file: File }[];
   isInStock: boolean;
-  attributes: { [key: string]: string | number };
+  attributes: { [key: string]: string | string[] };
 }
 
 interface AddProductFormProps {
@@ -55,7 +48,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     null
   );
 
-  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -72,7 +64,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     fetchCategories();
   }, []);
 
-  // Dynamic validation schema
   const getValidationSchema = () => {
     const schema = {
       category: Yup.string().required("Category is required"),
@@ -89,16 +80,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         )
         .nullable(),
       brand: Yup.string().required("Brand is required"),
-      color: Yup.string().required("Color is required"),
-      material: Yup.string().required("Material is required"),
-      compatibleDevices: Yup.string().required(
-        "Compatible devices are required"
-      ),
-      screenSize: Yup.string().required("Screen size is required"),
-      dimensions: Yup.string().required("Dimensions are required"),
-      batteryLife: Yup.string().nullable(),
-      sensorType: Yup.string().nullable(),
-      batteryDescription: Yup.string().nullable(),
       features: Yup.array()
         .of(Yup.string().required("Feature cannot be empty"))
         .min(1, "At least one feature is required"),
@@ -110,17 +91,39 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         )
         .min(1, "At least one image is required"),
       isInStock: Yup.boolean().required("Stock status is required"),
-      attributes: Yup.object().shape(
-        selectedCategory?.attributes.reduce((acc, attr) => {
+      attributes: Yup.object()
+        .required("Attributes are required")
+        .test("non-empty", "At least one attribute is required", (value) => {
+          return value && Object.keys(value).length > 0;
+        })
+        .test(
+          "valid-values",
+          "Attribute values must be strings or string arrays",
+          (value) => {
+            if (!value) return false;
+            return Object.values(value).every((val) =>
+              Array.isArray(val)
+                ? val.every((item) => typeof item === "string")
+                : typeof val === "string"
+            );
+          }
+        ),
+    };
+
+    // Dynamic validation for category-specific attributes
+    if (selectedCategory?.attributes) {
+      schema.attributes = Yup.object().shape(
+        selectedCategory.attributes.reduce((acc, attr) => {
           if (attr.required) {
             if (attr.type === "number") {
               acc[attr.name] = Yup.number()
                 .required(`${attr.name} is required`)
                 .typeError(`${attr.name} must be a number`);
             } else if (attr.type === "select") {
-              acc[attr.name] = Yup.string().required(
-                `${attr.name} is required`
-              );
+              acc[attr.name] = Yup.array()
+                .of(Yup.string())
+                .min(1, `At least one ${attr.name} must be selected`)
+                .required(`${attr.name} is required`);
             } else {
               acc[attr.name] = Yup.string().required(
                 `${attr.name} is required`
@@ -128,9 +131,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
             }
           }
           return acc;
-        }, {} as any) || {}
-      ),
-    };
+        }, {} as any)
+      );
+    }
+
     return Yup.object(schema);
   };
 
@@ -141,21 +145,12 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     price: "",
     originalPrice: "",
     brand: "",
-    color: "",
-    material: "",
-    compatibleDevices: "",
-    screenSize: "",
-    dimensions: "",
-    batteryLife: "",
-    sensorType: "",
-    batteryDescription: "",
     features: [""],
     imageFiles: [],
     isInStock: true,
     attributes: {},
   };
 
-  // Upload single file with progress
   const uploadSingleFile = async (
     file: File
   ): Promise<{ url: string; publicId: string } | null> => {
@@ -198,7 +193,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         return;
       }
 
-      // Upload images
       const uploadPromises = values.imageFiles.map(async (image) => {
         return await uploadSingleFile(image.file);
       });
@@ -220,9 +214,20 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         return;
       }
 
+      // Validate attributes
+      if (!values.attributes || Object.keys(values.attributes).length === 0) {
+        toast.error("At least one attribute is required");
+        return;
+      }
+
       const productData = {
         ...values,
         imageFiles: uploadedImages,
+        price: parseFloat(values.price.toString()),
+        originalPrice: values.originalPrice
+          ? parseFloat(values.originalPrice.toString())
+          : null,
+        attributes: values.attributes, // Send attributes as-is (object)
       };
 
       const response = await post("/products/create", productData);
@@ -237,16 +242,77 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         error?.response?.data?.data?.error ||
         error?.response?.data?.message ||
         "An error occurred during product creation";
-
       toast.error(errorMessage);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Utility function to capitalize first letter
   const capitalize = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  // Custom styles for react-select to match form styling
+  const customSelectStyles = {
+    control: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: theme === "dark" ? "#374151" : "#ffffff",
+      borderColor: theme === "dark" ? "#4b5563" : "#d1d5db",
+      boxShadow: state.isFocused
+        ? "0 0 0 2px #3b82f6"
+        : "0 1px 2px rgba(0, 0, 0, 0.05)",
+      borderRadius: "0.5rem",
+      padding: "0.5rem",
+      "&:hover": {
+        borderColor: theme === "dark" ? "#6b7280" : "#9ca3af",
+      },
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      backgroundColor: theme === "dark" ? "#374151" : "#ffffff",
+      color: theme === "dark" ? "#ffffff" : "#1f2937",
+      borderRadius: "0.5rem",
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "#3b82f6"
+        : theme === "dark"
+        ? "#374151"
+        : "#ffffff",
+      color: state.isSelected
+        ? "#ffffff"
+        : theme === "dark"
+        ? "#ffffff"
+        : "#1f2937",
+      "&:hover": {
+        backgroundColor: theme === "dark" ? "#4b5563" : "#f3f4f6",
+      },
+    }),
+    multiValue: (provided: any) => ({
+      ...provided,
+      backgroundColor: theme === "dark" ? "#4b5563" : "#e5e7eb",
+    }),
+    multiValueLabel: (provided: any) => ({
+      ...provided,
+      color: theme === "dark" ? "#ffffff" : "#1f2937",
+    }),
+    multiValueRemove: (provided: any) => ({
+      ...provided,
+      color: theme === "dark" ? "#ffffff" : "#1f2937",
+      "&:hover": {
+        backgroundColor: "#ef4444",
+        color: "#ffffff",
+      },
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: theme === "dark" ? "#9ca3af" : "#6b7280",
+    }),
+    input: (provided: any) => ({
+      ...provided,
+      color: theme === "dark" ? "#ffffff" : "#1f2937",
+    }),
   };
 
   return (
@@ -377,11 +443,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
               />
             </div>
 
-            {/* Dynamic category attributes */}
             {selectedCategory?.attributes?.map((attr, index) => (
               <div key={index}>
                 <label
-                  htmlFor={`attributes[${index}].${attr.name}`}
+                  htmlFor={`attributes[${attr.name}]`}
                   className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
                 >
                   {capitalize(attr.name)}
@@ -389,17 +454,32 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                 </label>
                 {attr.type === "select" ? (
                   <Field
-                    as="select"
                     name={`attributes[${attr.name}]`}
-                    className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors text-sm"
-                  >
-                    <option value="">Select {capitalize(attr.name)}</option>
-                    {attr.options?.map((option, idx) => (
-                      <option key={idx} value={option}>
-                        {capitalize(option)}
-                      </option>
-                    ))}
-                  </Field>
+                    render={({ field, form }: any) => (
+                      <Select
+                        {...field}
+                        isMulti
+                        options={attr.options?.map((option) => ({
+                          value: option,
+                          label: capitalize(option),
+                        }))}
+                        className="text-sm"
+                        classNamePrefix="select"
+                        styles={customSelectStyles}
+                        placeholder={`Select ${capitalize(attr.name)}`}
+                        onChange={(selectedOptions) => {
+                          const values = selectedOptions
+                            ? selectedOptions.map((option: any) => option.value)
+                            : [];
+                          form.setFieldValue(field.name, values);
+                        }}
+                        value={field.value?.map((val: string) => ({
+                          value: val,
+                          label: capitalize(val),
+                        }))}
+                      />
+                    )}
+                  />
                 ) : (
                   <Field
                     type={attr.type}

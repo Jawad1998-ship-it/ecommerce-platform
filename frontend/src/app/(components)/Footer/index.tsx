@@ -156,7 +156,7 @@ const Footer = () => {
               Download our app for a better shopping experience!
             </p>
             <div className="flex space-x-2">
-              <a
+              <Link
                 href="https://play.google.com"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -169,8 +169,8 @@ const Footer = () => {
                   height={40}
                   className="object-contain"
                 />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://www.apple.com/app-store/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -183,7 +183,7 @@ const Footer = () => {
                   height={40}
                   className="object-contain"
                 />
-              </a>
+              </Link>
             </div>
           </div>
         </div>

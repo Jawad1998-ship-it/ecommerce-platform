@@ -16,12 +16,13 @@ const publicRoutes: string[] = [
   "/admin/permissions",
   "/admin/settings",
   "/admin/products",
+  "/business",
   "/business/products",
   "/business/products/add",
   "/business/products/edit/*",
   "/user/profile",
   "/user/settings",
-  "/business",
+  "/order-details",
 ];
 const roleRoutes: RoleRoutes = {
   admin: [...privateRoutes, ...publicRoutes],

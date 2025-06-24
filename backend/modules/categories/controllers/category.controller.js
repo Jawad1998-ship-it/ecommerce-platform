@@ -8,14 +8,9 @@ const Category = db.model.Category;
 
 export const createCategory = async (req, res) => {
   try {
-    const {
-      name,
-      description,
-      requiresApproval,
-      allowedUsers,
-      attributes,
-    } = req.body;
-    console.log("Request body:", JSON.stringify(req.body, null, 2));
+    const { name, description, requiresApproval, allowedUsers, attributes } =
+      req.body;
+
     // Validation for required fields
     if (!name || !description || !attributes) {
       return errorResponse(
@@ -52,16 +47,28 @@ export const createCategory = async (req, res) => {
       }
     }
 
-    // Validate allowedUsers emails if provided
-    if (
-      allowedUsers &&
-      Array.isArray(allowedUsers) &&
-      allowedUsers.length > 0
-    ) {
+    // Filter out empty strings, null, and undefined values from allowedUsers
+    // Only keep non-empty strings for validation and storage
+    const filteredAllowedUsers = allowedUsers
+      ? allowedUsers.filter(
+          (email) =>
+            email !== null &&
+            email !== undefined &&
+            typeof email === "string" &&
+            email.trim() !== ""
+        )
+      : [];
+
+    console.log("Original allowedUsers:", allowedUsers);
+    console.log("Filtered allowedUsers:", filteredAllowedUsers);
+
+    // Validate only the non-empty emails
+    if (filteredAllowedUsers.length > 0) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const invalidEmails = allowedUsers.filter(
-        (email) => !emailRegex.test(email)
+      const invalidEmails = filteredAllowedUsers.filter(
+        (email) => !emailRegex.test(email.trim())
       );
+
       if (invalidEmails.length > 0) {
         return errorResponse(
           400,
@@ -77,7 +84,7 @@ export const createCategory = async (req, res) => {
       name,
       description,
       requiresApproval: requiresApproval ?? true,
-      allowedUsers: allowedUsers || [],
+      allowedUsers: filteredAllowedUsers, // Use filtered emails
       attributes: attributes || [],
     };
 
