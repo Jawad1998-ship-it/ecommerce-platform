@@ -34,23 +34,20 @@ export interface UserState {
 }
 
 export interface Product {
-  id: number;
+  _id: string;
   name: string;
   price: number;
-  originalPrice: number;
-  image: string;
-  description: string;
-  brand: string;
-  color: string;
-  material: string;
-  compatibleDevices: string;
-  screenSize: string;
-  dimensions: string;
-  batteryLife: string;
-  sensorType: string;
-  batteryDescription: string;
-  features: string[];
-  rating: number;
+  imageUrls: string[];
+  description?: string;
+  brand?: string;
+  category?: string;
+  features?: string[];
+  attributes?: { [key: string]: string | string[] };
+  isInStock?: boolean;
+  originalPrice?: number;
+  cloudinaryPublicIds?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ProductDetailsSectionProps {
@@ -59,10 +56,20 @@ export interface ProductDetailsSectionProps {
   ratingDistribution: number[];
 }
 
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
 export interface InitialStateTypes {
   isSidebarCollapsed: boolean;
   currentUser: object;
-  cartItems: { [productId: number]: number };
+  cartItems: { [key: string]: CartItem };
   loading: boolean;
 }
 

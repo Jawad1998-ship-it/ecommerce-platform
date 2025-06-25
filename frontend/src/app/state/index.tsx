@@ -1,10 +1,10 @@
-import { InitialStateTypes } from "@/types/types";
+import { InitialStateTypes, Product, CartItem } from "@/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: InitialStateTypes = {
   isSidebarCollapsed: false,
   currentUser: {},
-  cartItems: {},
+  cartItems: {}, // { [key: string]: { product: Product; quantity: number } }
   loading: false,
 };
 
@@ -18,21 +18,30 @@ export const globalSlice = createSlice({
     setCurrentUser: (state, action: PayloadAction<object>) => {
       state.currentUser = action.payload;
     },
-    addToCart: (state, action: PayloadAction<number>) => {
-      const productId = action.payload;
-      state.cartItems[productId] = (state.cartItems[productId] || 0) + 1;
-    },
-    removeFromCart: (state, action: PayloadAction<number>) => {
-      const productId = action.payload;
-      const newQuantity = (state.cartItems[productId] || 0) - 1;
-      if (newQuantity <= 0) {
-        const { [productId]: _, ...rest } = state.cartItems;
-        state.cartItems = rest;
+    addToCart: (state, action: PayloadAction<Product>) => {
+      const product = action.payload;
+      const productId = product._id;
+
+      // If cartItems[productId] exists, increment quantity; otherwise, initialize
+      if (state.cartItems[productId]) {
+        state.cartItems[productId].quantity += 1;
       } else {
-        state.cartItems[productId] = newQuantity;
+        state.cartItems[productId] = { product, quantity: 1 };
       }
     },
-    clearCartItem: (state, action: PayloadAction<number>) => {
+    removeFromCart: (state, action: PayloadAction<string>) => {
+      const productId = action.payload;
+      if (state.cartItems[productId]) {
+        const newQuantity = state.cartItems[productId].quantity - 1;
+        if (newQuantity <= 0) {
+          const { [productId]: _, ...rest } = state.cartItems;
+          state.cartItems = rest;
+        } else {
+          state.cartItems[productId].quantity = newQuantity;
+        }
+      }
+    },
+    clearCartItem: (state, action: PayloadAction<string>) => {
       const productId = action.payload;
       const { [productId]: _, ...rest } = state.cartItems;
       state.cartItems = rest;

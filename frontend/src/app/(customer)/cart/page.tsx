@@ -6,133 +6,42 @@ import { useTheme } from "next-themes";
 import { useAppSelector, useAppDispatch } from "@/app/redux";
 import { addToCart, removeFromCart, clearCartItem } from "@/app/state";
 import { Plus, Minus } from "lucide-react";
-import { useRouter } from "next/navigation";
 
-// Product data (same as provided)
-const products = [
-  {
-    id: 1,
-    name: "Fashion Bags",
-    price: 59.99,
-    image: "/images/bags.jpg",
-  },
-  {
-    id: 2,
-    name: "Stylish Glasses",
-    price: 29.99,
-    image: "/images/glasses.jpg",
-  },
-  {
-    id: 3,
-    name: "Jackets",
-    price: 89.99,
-    image: "/images/jackets.jpg",
-  },
-  {
-    id: 4,
-    name: "Jeans",
-    price: 49.99,
-    image: "/images/jeans.jpg",
-  },
-  {
-    id: 5,
-    name: "Shoes",
-    price: 69.99,
-    image: "/images/shoes.jpg",
-  },
-  {
-    id: 6,
-    name: "Suits",
-    price: 199.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 7,
-    name: "Watches",
-    price: 149.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 8,
-    name: "Hats",
-    price: 24.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 9,
-    name: "T-shirts",
-    price: 19.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 10,
-    name: "Belts",
-    price: 29.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 11,
-    name: "Socks",
-    price: 9.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 12,
-    name: "Scarves",
-    price: 19.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 13,
-    name: "Gloves",
-    price: 14.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 14,
-    name: "Swimwear",
-    price: 34.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 15,
-    name: "Sweaters",
-    price: 49.99,
-    image: "/images/suits.jpg",
-  },
-  {
-    id: 16,
-    name: "Coats",
-    price: 129.99,
-    image: "/images/suits.jpg",
-  },
-];
+interface CartItem {
+  product: Product;
+  quantity: number;
+}
 
 const CartItem = ({ item, onUpdateQuantity }) => {
   const dispatch = useAppDispatch();
+
   const handleQuantityChange = (e) => {
     const newQuantity = parseInt(e.target.value);
     if (newQuantity >= 1) {
-      onUpdateQuantity(item?.id, newQuantity);
+      onUpdateQuantity(item?.product?._id, newQuantity);
     }
   };
 
   const handleAdd = () => {
-    dispatch(addToCart(item?.id));
+    dispatch(addToCart(item?.product));
   };
 
   const handleRemove = () => {
-    dispatch(removeFromCart(item?.id));
+    dispatch(removeFromCart(item?.product?._id));
   };
 
   return (
     <div
       className={`bg-gradient-to-b from-blue-50 to-purple-50 border-2 px-4 sm:px-5 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center rounded-lg mb-4 shadow-sm w-full`}
     >
-      <Link href={`/products/${item?.name?.toLowerCase()}/dp/${item?.id}`}>
+      <Link
+        href={`/products/${item?.product?.name?.toLowerCase()}/dp/${
+          item?.product?._id
+        }`}
+      >
         <Image
-          src={item?.image}
-          alt={item?.name}
+          src={item?.product?.imageUrls[0]}
+          alt={item?.product?.name}
           width={100}
           height={100}
           className="object-cover rounded w-24 h-24 sm:w-32 sm:h-32"
@@ -140,10 +49,10 @@ const CartItem = ({ item, onUpdateQuantity }) => {
       </Link>
       <div className="flex-1 mt-3 sm:mt-0 sm:ml-4 w-full">
         <h3 className="text-base sm:text-lg font-semibold text-gray-800">
-          {item?.name}
+          {item?.product?.name}
         </h3>
         <p className="text-gray-600 text-sm sm:text-base">
-          ${item?.price?.toFixed(2)}
+          ${item?.product?.price?.toFixed(2)}
         </p>
         <div className="flex items-center mt-2 gap-2 sm:gap-3">
           <div className="flex items-center gap-2">
@@ -153,14 +62,13 @@ const CartItem = ({ item, onUpdateQuantity }) => {
             >
               <Minus size={16} strokeWidth={2} />
             </button>
-            <span
+            <input
+              type="number"
+              value={item?.quantity}
               onChange={handleQuantityChange}
-              className="text-black border rounded px-2 py-2 h-10 w-16 text-center text-sm sm:text-base 
-              [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none 
-              [&::-webkit-inner-spin-button]:appearance-none outline-none"
-            >
-              {item?.quantity}
-            </span>
+              min="1"
+              className="text-black border rounded px-2 py-2 h-10 w-16 text-center text-sm sm:text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none outline-none"
+            />
             <button
               onClick={handleAdd}
               className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 h-10 rounded-r text-sm sm:text-base transition-colors"
@@ -169,7 +77,7 @@ const CartItem = ({ item, onUpdateQuantity }) => {
             </button>
           </div>
           <button
-            onClick={() => dispatch(clearCartItem(item?.id))}
+            onClick={() => dispatch(clearCartItem(item?.product?._id))}
             className="text-red-500 hover:text-red-600 transition-colors text-sm sm:text-base px-4 py-2 border-l border-gray-300 ml-4"
           >
             Remove
@@ -177,7 +85,7 @@ const CartItem = ({ item, onUpdateQuantity }) => {
         </div>
       </div>
       <p className="font-semibold text-gray-800 text-sm sm:text-base mt-2 sm:mt-0">
-        ${(item?.price * item?.quantity)?.toFixed(2)}
+        ${(item?.product?.price * item?.quantity)?.toFixed(2)}
       </p>
     </div>
   );
@@ -188,28 +96,24 @@ const CartPage = () => {
   const dispatch = useAppDispatch();
   const cartItemsFromStore = useAppSelector((state) => state.global.cartItems);
 
-  // Convert Redux cartItems object to array with product details
-  const cartItems = Object?.entries(cartItemsFromStore)
-    ?.map(([id, quantity]) => {
-      const product = products?.find((p) => p?.id === parseInt(id));
-      return product ? { ...product, quantity } : null;
-    })
-    .filter((item) => item !== null);
+  //convert Redux cartItems object to array of CartItem objects
+  const cartItems = Object.values(cartItemsFromStore);
 
   const updateQuantity = (id, quantity) => {
-    if (quantity > cartItemsFromStore[id]) {
-      for (let i = cartItemsFromStore[id]; i < quantity; i++) {
-        dispatch(addToCart(id));
+    const currentQuantity = cartItemsFromStore[id]?.quantity || 0;
+    if (quantity > currentQuantity) {
+      for (let i = currentQuantity; i < quantity; i++) {
+        dispatch(addToCart(cartItemsFromStore[id]?.product));
       }
-    } else {
-      for (let i = cartItemsFromStore[id]; i > quantity; i--) {
+    } else if (quantity < currentQuantity) {
+      for (let i = currentQuantity; i > quantity; i--) {
         dispatch(removeFromCart(id));
       }
     }
   };
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item?.price * item?.quantity,
+  const subtotal = cartItems?.reduce(
+    (sum, item) => sum + item?.product?.price * item?.quantity,
     0
   );
 
@@ -236,7 +140,7 @@ const CartPage = () => {
             <div className="bg-white flex-1 p-4 sm:p-6 rounded-lg shadow-lg">
               {cartItems?.map((item) => (
                 <CartItem
-                  key={item?.id}
+                  key={item?.product?._id}
                   item={item}
                   onUpdateQuantity={updateQuantity}
                 />

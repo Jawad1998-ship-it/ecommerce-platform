@@ -16,6 +16,28 @@ import Loading from "@/app/loading";
 import SearchBar from "./SearchBar";
 import SubMenu from "./SubMenu";
 
+interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  imageUrls: string[];
+  description?: string;
+  brand?: string;
+  category?: string;
+  features?: string[];
+  attributes?: { [key: string]: string | string[] };
+  isInStock?: boolean;
+  originalPrice?: number;
+  cloudinaryPublicIds?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
 const Navbar = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -26,9 +48,14 @@ const Navbar = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { post } = useAxios();
   const cartItems = useAppSelector((state) => state.global.cartItems);
-  const cartItemsCount =
-    cartItems &&
-    Object?.values(cartItems)?.reduce((total, quantity) => total + quantity, 0);
+
+  // Calculate cart items count by summing the quantity of each CartItem
+  const cartItemsCount = cartItems
+    ? Object.values(cartItems).reduce(
+        (total, item) => total + (item.quantity || 0),
+        0
+      )
+    : 0;
 
   const toggleDropdown = (): void => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -148,11 +175,7 @@ const Navbar = () => {
                   {user?.role === "customer" || !user ? (
                     <Link href="/cart">
                       <span className="absolute -top-3 -right-3 min-w-[1.25rem] h-5 px-1 text-xs font-semibold text-white bg-red-500 rounded-full flex items-center justify-center leading-none">
-                        {user?.role === "customer" || !user
-                          ? cartItemsCount > 99
-                            ? "99+"
-                            : cartItemsCount
-                          : 0}
+                        {cartItemsCount > 99 ? "99+" : cartItemsCount}
                       </span>
                     </Link>
                   ) : null}

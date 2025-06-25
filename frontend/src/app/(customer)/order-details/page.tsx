@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { CreditCard, Lock } from "lucide-react";
@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { useAppSelector } from "@/app/redux";
 
 const checkoutValidationSchema = Yup.object({
   firstName: Yup.string().required("First name is required"),
@@ -27,8 +28,13 @@ const OrderDetails = () => {
   const router = useRouter();
   const { post } = useAxios();
   const { theme } = useTheme();
+  const [orders, setOrders] = useState();
   const user = null;
-
+  const cartItemsFromStore = useAppSelector((state) => state.global.cartItems);
+  console.log("store cart items", cartItemsFromStore);
+  // Convert Redux cartItems object to array of CartItem objects
+  const cartItems = Object.values(cartItemsFromStore);
+  console.log("cartitems", cartItems);
   const order = {
     items: [
       {
@@ -276,13 +282,13 @@ const OrderDetails = () => {
                           <span>Product</span>
                           <span>Subtotal</span>
                         </div>
-                        {order.items.map((item) => (
+                        {cartItems.map((item) => (
                           <div
                             key={item.id}
                             className="flex justify-between text-sm border-b border-gray-200 dark:border-gray-700 pb-2"
                           >
                             <span>
-                              {item.name} × {item.quantity}
+                              {item?.product?.name} × {item.quantity}
                             </span>
                             <span>
                               $

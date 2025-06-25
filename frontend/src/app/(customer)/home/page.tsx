@@ -39,13 +39,13 @@ const Home = () => {
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector((state) => state.global.cartItems);
   const { get } = useAxios();
-
+  console.log(cartItems);
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
         const response = await get("/products/all-products");
-        console.log(response?.data?.data?.products);
+        console.log("API Response:", response?.data?.data?.products);
         if (response?.status === 200) {
           const fetchedProducts = response?.data?.data?.products || [];
           setProducts(fetchedProducts);
@@ -66,11 +66,11 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = (productId: string) => {
-    setAnimationTrigger((prev) => ({ ...prev, [productId]: "add" }));
-    dispatch(addToCart(productId));
+  const handleAddToCart = (product: Product) => {
+    setAnimationTrigger((prev) => ({ ...prev, [product._id]: "add" }));
+    dispatch(addToCart(product));
     setTimeout(() => {
-      setAnimationTrigger((prev) => ({ ...prev, [productId]: null }));
+      setAnimationTrigger((prev) => ({ ...prev, [product._id]: null }));
     }, 500);
   };
 
@@ -127,7 +127,7 @@ const Home = () => {
             <div className="text-center">
               <p className="text-red-500">{error}</p>
             </div>
-          ) : products?.length === 0 ? (
+          ) : products.length === 0 ? (
             <div className="text-center">
               <p className="text-gray-600 dark:text-gray-300">
                 No products available.
@@ -135,17 +135,17 @@ const Home = () => {
             </div>
           ) : (
             <div className="grid grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
-              {products?.map((product) => (
+              {products.map((product) => (
                 <Link
-                  href={`/products/${product?.name
+                  href={`/products/${product.name
                     .toLowerCase()
-                    .replace(/\s+/g, "-")}/dp/${product?._id}`}
-                  key={product?._id}
+                    .replace(/\s+/g, "-")}/dp/${product._id}`}
+                  key={product._id}
                 >
                   <div className="bg-white dark:bg-gray-800 border border-b-gray-500 rounded-lg hover:shadow-gray-400 shadow-lg overflow-hidden hover:shadow-xl transition">
                     <Image
-                      src={product?.imageUrls[0] || "/images/placeholder.jpg"}
-                      alt={product?.name}
+                      src={product.imageUrls[0] || "/images/placeholder.jpg"}
+                      alt={product.name}
                       width={300}
                       height={300}
                       priority
@@ -153,17 +153,17 @@ const Home = () => {
                     />
                     <div className="p-3 sm:p-4">
                       <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white mb-2">
-                        {product?.name}
+                        {product.name}
                       </h3>
                       <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-2">
-                        ${product?.price?.toFixed(2)}
+                        ${product.price.toFixed(2)}
                       </p>
-                      {cartItems && cartItems[product?._id] ? (
+                      {cartItems[product._id] && (
                         <div className="flex items-center justify-between px-1 border rounded-lg overflow-hidden">
                           <button
                             onClick={(e) => {
                               e.preventDefault();
-                              handleRemoveFromCart(product?._id);
+                              handleRemoveFromCart(product._id);
                             }}
                             className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-3 sm:px-4 py-1 sm:py-2 font-medium transition hover:bg-gray-300 dark:hover:bg-gray-500"
                           >
@@ -171,7 +171,9 @@ const Home = () => {
                           </button>
                           <AnimatePresence mode="wait">
                             <motion.span
-                              key={`${product._id}-${cartItems[product?._id]}`}
+                              key={`${product._id}-${
+                                cartItems[product._id]?.quantity
+                              }`}
                               initial={
                                 animationTrigger[product._id] === "add"
                                   ? { y: -20, opacity: 0 }
@@ -184,24 +186,27 @@ const Home = () => {
                               transition={{ duration: 0.3 }}
                               className="px-3 sm:px-4 py-1 sm:py-2 text-sm sm:text-base text-gray-800 dark:text-white"
                             >
-                              {formatCartQuantity(cartItems[product?._id])}
+                              {formatCartQuantity(
+                                cartItems[product._id]?.quantity || 0
+                              )}
                             </motion.span>
                           </AnimatePresence>
                           <button
                             onClick={(e) => {
                               e.preventDefault();
-                              handleAddToCart(product?._id);
+                              handleAddToCart(product);
                             }}
                             className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-3 sm:px-4 py-1 sm:py-2 font-medium transition hover:bg-gray-300 dark:hover:bg-gray-500"
                           >
                             <Plus size={16} strokeWidth={2} />
                           </button>
                         </div>
-                      ) : (
+                      )}
+                      {!cartItems[product._id] && (
                         <button
                           onClick={(e) => {
                             e.preventDefault();
-                            handleAddToCart(product?._id);
+                            handleAddToCart(product);
                           }}
                           className="w-full bg-blue-500 hover:bg-blue-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-medium transition text-sm sm:text-base"
                         >
