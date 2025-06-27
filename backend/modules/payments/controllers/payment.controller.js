@@ -1,10 +1,10 @@
 import db from "../../../config/database.config.js";
 import errorResponse from "../../../utils/errorResponse.js";
 import successResponse from "../../../utils/successResponse.js";
-import Coupon from "../../coupons/models/coupons.model.js";
+import Coupon from "../../coupons/models/coupon.model.js";
 import { stripe } from "../../../lib/stripe.js";
 import { createStripeCoupon } from "../../../lib/createStripeCoupon.js";
-import { createCoupon } from "../../coupons/controllers/coupons.controller.js";
+import { createCoupon } from "../../coupons/controllers/coupon.controller.js";
 
 const Payment = db.model.Payment;
 

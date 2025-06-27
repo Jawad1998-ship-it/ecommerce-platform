@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-// Define your schema
 const UserSchema = new mongoose.Schema(
   {
     f_name: { type: String, required: [true, "First name is required"] },
@@ -42,6 +41,5 @@ UserSchema.methods.comparePassword = async function (password) {
   return bcrypt.compare(password, this.password);
 };
 
-// Create and export the model
 const User = mongoose.model("User", UserSchema);
 export default User;

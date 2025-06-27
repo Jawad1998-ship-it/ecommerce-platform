@@ -18,6 +18,7 @@ const publicRoutes: string[] = [
   "/admin/products",
   "/business",
   "/business/products",
+  "/business/orders",
   "/business/products/add",
   "/business/products/edit/*",
   "/user/profile",

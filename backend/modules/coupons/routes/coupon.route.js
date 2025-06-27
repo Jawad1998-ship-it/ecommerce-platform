@@ -1,5 +1,5 @@
 import express from "express";
-import * as CouponController from "../controllers/coupons.controller.js";
+import * as CouponController from "../controllers/coupon.controller.js";
 import { protectedRoute } from "../../../middlewares/authJwt.js";
 
 const CouponRouter = express.Router();

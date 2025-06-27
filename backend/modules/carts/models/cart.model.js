@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-// Define your schema
 const CartSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -16,6 +15,5 @@ const CartSchema = new mongoose.Schema(
   }
 );
 
-// Create and export the model
 const Cart = mongoose.model("Cart", CartSchema);
 export default Cart;

@@ -1,15 +1,18 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-// Schema for the ordered items (as a sub-document)
 const OrderItemSchema = new Schema({
   productId: {
-    type: Schema.Types.ObjectId,
-    ref: "Product", // Assumes you have a 'Product' model
+    type: String,
+    ref: "Product",
     required: true,
   },
   name: {
     type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
     required: true,
   },
   quantity: {
@@ -17,16 +20,14 @@ const OrderItemSchema = new Schema({
     required: true,
     min: 1,
   },
-  price: {
+  subtotal: {
     type: Number,
     required: true,
   },
 });
 
-// Main Order Schema
 const OrderSchema = new Schema(
   {
-    // Billing Details from the form
     firstName: {
       type: String,
       required: [true, "First name is required"],
@@ -47,6 +48,11 @@ const OrderSchema = new Schema(
       required: [true, "Town / City is required"],
       trim: true,
     },
+    country: {
+      type: String,
+      required: [true, "Country is required"],
+      trim: true,
+    },
     phone: {
       type: String,
       required: [true, "Phone number is required"],
@@ -65,20 +71,13 @@ const OrderSchema = new Schema(
       type: String,
       trim: true,
     },
-
-    // Order Summary Details
-    items: [OrderItemSchema],
-    summary: {
+    orderItems: [OrderItemSchema],
+    orderSummary: {
       itemsSubtotal: { type: Number, required: true },
       shipping: { type: Number, required: true },
-      tax: { type: Number, required: true },
-    },
-    grandTotal: {
-      type: Number,
-      required: true,
+      total: { type: Number, required: true },
     },
 
-    // Payment and Status
     paymentMethod: {
       type: String,
       required: [true, "Payment method is required"],
@@ -86,26 +85,15 @@ const OrderSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
+      enum: ["Pending", "Complete", "Shipped", "Delivered", "Cancelled"],
       default: "Pending",
-    },
-
-    // Optional user link for logged-in customers
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User", // Assumes you have a 'User' model
-      required: false, // Not required for guest checkouts
     },
   },
   {
-    // Automatically adds createdAt and updatedAt fields
     timestamps: true,
   }
 );
 
-// Create and export the model
-// The third argument to mongoose.model is the collection name in the database
-const Order =
-  mongoose.models.Order || mongoose.model("Order", OrderSchema, "orders");
+const OrderDetails = mongoose.model("OrderDetails", OrderSchema);
 
-module.exports = Order;
+export default OrderDetails;

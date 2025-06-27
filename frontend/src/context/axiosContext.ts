@@ -4,7 +4,8 @@ import axios from "axios";
 import { useState, useCallback } from "react";
 
 const useAxios = () => {
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const baseURL =
+    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
   if (!baseURL) {
     console.error("BASE URL is not defined. Please check your host.");
   }

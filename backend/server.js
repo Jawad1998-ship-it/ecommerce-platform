@@ -13,10 +13,10 @@ import hpp from "hpp";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 
 // Security middleware
-app.use(helmet());
+// app.use(helmet());
 
 // Rate limiting to prevent brute force attacks
 const limiter = rateLimit({

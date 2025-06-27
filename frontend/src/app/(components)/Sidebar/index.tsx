@@ -14,6 +14,7 @@ import {
   Building,
   UserCog,
   Grid3X3,
+  ShoppingCart,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useState, useEffect } from "react";
@@ -111,6 +112,12 @@ const Sidebar = () => {
           href="/business/products"
           icon={Package}
           label="Products"
+          isCollapsed={isSidebarCollapsed}
+        />
+        <SidebarLink
+          href="/business/orders"
+          icon={ShoppingCart}
+          label="Orders"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink

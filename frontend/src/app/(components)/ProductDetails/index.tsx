@@ -77,24 +77,30 @@ const ProductDetailsSection: React.FC<ProductDetailsSectionProps> = ({
       </div>
     );
   };
-
+  console.log(product);
   return (
     <div className="w-1/3">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-        {product.name}
+        {product?.name}
       </h1>
       <p className="text-gray-600 dark:text-gray-300 mb-4">
-        {product.description}
+        {product?.description
+          ?.split(" ")
+          ?.map(
+            (word) =>
+              word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase()
+          )
+          ?.join(" ") || ""}
       </p>
       <div
         className="flex items-center mb-4 cursor-pointer"
         onClick={() => setIsRatingPopupOpen(true)}
       >
-        {renderStars(product.rating)} {/* Use product.rating with SVG stars */}
-        <span className="ml-2 text-gray-600 dark:text-gray-300">
+        {/* {renderStars(product?.rating)} */}
+        {/* <span className="ml-2 text-gray-600 dark:text-gray-300">
           {product.rating} out of 5 stars ({totalRatings.toLocaleString()}{" "}
           ratings)
-        </span>
+        </span> */}
       </div>
       <RatingPopup
         isOpen={isRatingPopupOpen}
@@ -105,55 +111,39 @@ const ProductDetailsSection: React.FC<ProductDetailsSectionProps> = ({
       />
       <div className="mb-4">
         <p className="text-xl font-semibold text-gray-800 dark:text-white">
-          ${product.price.toFixed(2)}
+          ${product?.price?.toFixed(2)}
         </p>
-        {product.originalPrice && (
+        {product?.originalPrice && (
           <p className="text-sm text-gray-500 line-through">
-            List Price: ${product.originalPrice.toFixed(2)}
+            List Price: ${product?.originalPrice?.toFixed(2)}
           </p>
         )}
         <p className="text-sm text-gray-600 dark:text-gray-300">
           $
           {(
-            ((product.originalPrice - product.price) / product.originalPrice) *
+            ((product?.originalPrice - product?.price) /
+              product?.originalPrice) *
             100
-          ).toFixed(0)}
+          )?.toFixed(0)}
           % off
         </p>
       </div>
       <p className="text-green-600 dark:text-green-400 mb-4">In Stock</p>
       <p className="text-gray-600 dark:text-gray-300 mb-2">
-        Ships from: Amazon
+        Ships from: Ecommerce
       </p>
       <p className="text-gray-600 dark:text-gray-300 mb-4">
-        Sold by: {product.brand} AUTHORIZED
+        Sold by: {product?.brand} AUTHORIZED
       </p>
       <p className="text-gray-600 dark:text-gray-300 mb-4">
         30-day return/refund/replacement
       </p>
       <div className="mb-4">
         <p className="text-gray-600 dark:text-gray-300">
-          <span className="font-semibold">Brand:</span> {product.brand}
+          <span className="font-semibold">Brand:</span> {product?.brand}
         </p>
-        <p className="text-gray-600 dark:text-gray-300">
-          <span className="font-semibold">Color:</span> {product.color}
-        </p>
-        <p className="text-gray-600 dark:text-gray-300">
-          <span className="font-semibold">Material:</span> {product.material}
-        </p>
-        <p className="text-gray-600 dark:text-gray-300">
-          <span className="font-semibold">Compatible Devices:</span>{" "}
-          {product.compatibleDevices}
-        </p>
-        <p className="text-gray-600 dark:text-gray-300">
-          <span className="font-semibold">Screen Size:</span>{" "}
-          {product.screenSize}
-        </p>
-        <p className="text-gray-600 dark:text-gray-300">
-          <span className="font-semibold">Product Dimensions:</span>{" "}
-          {product.dimensions}
-        </p>
-        {showMoreSpecs && (
+
+        {/* {showMoreSpecs && (
           <>
             <p className="text-gray-600 dark:text-gray-300">
               <span className="font-semibold">Battery Life:</span>{" "}
@@ -168,20 +158,20 @@ const ProductDetailsSection: React.FC<ProductDetailsSectionProps> = ({
               {product.batteryDescription}
             </p>
           </>
-        )}
-        <button
+        )} */}
+        {/* <button
           onClick={toggleShowMoreSpecs}
           className="text-blue-500 hover:underline text-sm mt-2"
         >
           {showMoreSpecs ? "See less" : "See more"}
-        </button>
+        </button> */}
       </div>
       <div className="mt-6">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
           About this item
         </h2>
         <ul className="list-disc list-inside text-gray-600 dark:text-gray-300">
-          {product.features.map((feature, index) => (
+          {product?.features?.map((feature, index) => (
             <li key={index}>{feature}</li>
           ))}
         </ul>

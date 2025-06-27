@@ -1,5 +1,5 @@
-import { InitialStateTypes, Product, CartItem } from "@/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { InitialStateTypes, Product } from "@/types/types";
 
 const initialState: InitialStateTypes = {
   isSidebarCollapsed: false,
@@ -46,6 +46,9 @@ export const globalSlice = createSlice({
       const { [productId]: _, ...rest } = state.cartItems;
       state.cartItems = rest;
     },
+    clearCart: (state) => {
+      state.cartItems = {};
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
@@ -58,6 +61,7 @@ export const {
   addToCart,
   removeFromCart,
   clearCartItem,
+  clearCart,
   setLoading,
 } = globalSlice.actions;
 export default globalSlice.reducer;

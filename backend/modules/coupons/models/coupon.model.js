@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-// Define your schema
 const CouponSchema = new mongoose.Schema(
   {
     code: { type: String, required: true, unique: true },
@@ -20,6 +19,5 @@ const CouponSchema = new mongoose.Schema(
   }
 );
 
-// Create and export the model
 const Coupon = mongoose.model("Coupon", CouponSchema);
 export default Coupon;

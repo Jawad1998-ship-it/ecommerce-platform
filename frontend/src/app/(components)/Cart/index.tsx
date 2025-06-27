@@ -6,8 +6,9 @@ import { addToCart, removeFromCart } from "@/app/state";
 import { Plus, Minus } from "lucide-react";
 import Link from "next/link";
 
+// Define the Product interface to match the structure used in ProductDetails
 interface Product {
-  id: number;
+  _id: string;
   name: string;
   price: number;
   originalPrice: number;
@@ -16,13 +17,20 @@ interface Product {
   brand: string;
   color: string;
   material: string;
-  compatibleDevices: string;
-  screenSize: string;
-  dimensions: string;
-  batteryLife: string;
-  sensorType: string;
-  batteryDescription: string;
+  compatibleDevices?: string;
+  screenSize?: string;
+  dimensions?: string;
+  batteryLife?: string;
+  sensorType?: string;
+  batteryDescription?: string;
   features: string[];
+  attributes?: { color: string[] };
+  category?: string;
+  cloudinaryPublicIds?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  imageUrls?: string[];
+  isInStock?: boolean;
 }
 
 interface AddToCartSectionProps {
@@ -36,15 +44,18 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
     "add" | "remove" | null
   >(null);
 
+  // Check if the product is in the cart and get its quantity
+  const cartItem = cartItems[product?._id];
+
   const handleAddToCart = () => {
     setAnimationTrigger("add");
-    dispatch(addToCart(product.id));
+    dispatch(addToCart(product)); // Pass the entire product object
     setTimeout(() => setAnimationTrigger(null), 500);
   };
 
   const handleRemoveFromCart = () => {
     setAnimationTrigger("remove");
-    dispatch(removeFromCart(product.id));
+    dispatch(removeFromCart(product?._id)); // Pass only the product ID for removal
     setTimeout(() => setAnimationTrigger(null), 500);
   };
 
@@ -56,23 +67,25 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
     <div className="w-1/3">
       <div className="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md sticky top-4">
         <p className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-          ${product.price.toFixed(2)}
+          ${product?.price?.toFixed(2)}
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-          List Price: ${product.originalPrice.toFixed(2)}
+          List Price: ${product?.originalPrice?.toFixed(2)}
         </p>
-        <p className="text-gray-600 dark:text-gray-300 mb-2">
+        {/* <p className="text-gray-600 dark:text-gray-300 mb-2">
           $1.24 Shipping & Import Fees Deposit to Bangladesh
         </p>
         <p className="text-gray-600 dark:text-gray-300 mb-2">
           Delivery Thursday, April 17. Order within 10 hrs 58 mins
+        </p> */}
+        <p className="text-green-600 dark:text-green-400 mb-4">
+          {product?.isInStock ? "In Stock" : "Out of Stock"}
         </p>
-        <p className="text-green-600 dark:text-green-400 mb-4">In Stock</p>
         <div className="flex items-center mb-4">
           <label className="mr-2 text-gray-600 dark:text-gray-300">
             Quantity:
           </label>
-          {cartItems[product.id] ? (
+          {cartItem ? (
             <div className="flex items-center justify-between border rounded-lg overflow-hidden">
               <button
                 onClick={handleRemoveFromCart}
@@ -82,7 +95,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
               </button>
               <AnimatePresence mode="wait">
                 <motion.span
-                  key={`${product.id}-${cartItems[product.id]}`}
+                  key={`${product._id}-${cartItem?.quantity}`}
                   initial={
                     animationTrigger === "add"
                       ? { y: -20, opacity: 0 }
@@ -95,7 +108,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
                   transition={{ duration: 0.3 }}
                   className="px-3 py-1 text-sm text-gray-800 dark:text-white"
                 >
-                  {formatCartQuantity(cartItems[product.id])}
+                  {formatCartQuantity(cartItem?.quantity)}
                 </motion.span>
               </AnimatePresence>
               <button
@@ -106,39 +119,41 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
               </button>
             </div>
           ) : (
-            <select className="border rounded-md p-1 text-gray-800 dark:text-white dark:bg-gray-800">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
+            <select
+              className="border rounded-md p-1 text-gray-800 dark:text-white dark:bg-gray-800"
+              onChange={(e) => {
+                const quantity = parseInt(e.target.value);
+                for (let i = 0; i < quantity; i++) {
+                  dispatch(addToCart(product));
+                }
+              }}
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
             </select>
           )}
         </div>
-        {!cartItems[product.id] && (
+        {!cartItem && (
           <button
             onClick={handleAddToCart}
             className="w-full bg-yellow-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-yellow-600 transition mb-2"
+            disabled={!product?.isInStock}
           >
             Add to Cart
           </button>
         )}
         <Link href="/cart">
-          <button className="w-full bg-orange-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-orange-600 transition mb-2">
+          <button
+            className="w-full bg-orange-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-orange-600 transition mb-2"
+            disabled={!product?.isInStock}
+          >
             Buy Now
           </button>
         </Link>
-
         <p className="text-gray-600 dark:text-gray-300 mt-2">
           Secure transaction
         </p>
-        {/* <div className="mt-4">
-          <label className="flex items-center text-gray-600 dark:text-gray-300">
-            <input type="checkbox" className="mr-2" />
-            Add a gift receipt for easy returns
-          </label>
-        </div>
-        <button className="w-full border border-gray-300 text-gray-800 dark:text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition mt-2">
-          Add to List
-        </button> */}
       </div>
     </div>
   );

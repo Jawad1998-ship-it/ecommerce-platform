@@ -41,7 +41,7 @@ export default function Login() {
           onClose: () => {
             dispatch(setCurrentUser(response?.data?.data?.user));
             if (response?.data?.data?.user?.role === "admin") {
-              router.push("/dashboard");
+              router.push("/admin");
             } else if (response?.data?.data?.user?.role === "company") {
               router.push("/business");
             } else if (response?.data?.data?.user?.role === "customer") {
