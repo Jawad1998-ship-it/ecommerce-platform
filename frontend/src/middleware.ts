@@ -24,6 +24,7 @@ const publicRoutes: string[] = [
   "/user/profile",
   "/user/settings",
   "/order-details",
+  "/payment",
 ];
 const roleRoutes: RoleRoutes = {
   admin: [...privateRoutes, ...publicRoutes],
