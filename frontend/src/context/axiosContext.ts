@@ -34,9 +34,9 @@ const useAxios = () => {
       // ) {
       //   return Promise.reject(error);
       // }
-      // Check if the error is a 401 and the request hasn't been retried yet
+      // Check if the error is a 455 and the request hasn't been retried yet
       if (
-        error.response?.status === 401 &&
+        error.response?.status === 455 &&
         !originalRequest._retry &&
         error.response?.data?.message !== "No refresh token provided"
       ) {
@@ -45,7 +45,7 @@ const useAxios = () => {
         try {
           // Call the refresh-token endpoint
           await axiosInstance.post("/refresh-token");
-
+          
           // Retry the original request with the new access token
           return axiosInstance(originalRequest);
         } catch (refreshError) {

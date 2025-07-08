@@ -74,7 +74,7 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
           autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
-          pauseOnHover: true,
+          pauseOnHover: false,
           draggable: true,
           theme: "light",
         });
@@ -92,7 +92,7 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: true,
+        pauseOnHover: false,
         draggable: true,
         theme: "light",
         style: { width: "500px" },

@@ -58,7 +58,7 @@ export const protectedRoute = async (req, res, next) => {
     const accessToken = req.cookies.access_token;
     if (!accessToken) {
       return res
-        .status(401)
+        .status(455)
         .json({ message: "Unauthorized - No access token provided" });
     }
     try {

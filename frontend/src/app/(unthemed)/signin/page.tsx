@@ -34,7 +34,7 @@ export default function Login() {
           autoClose: 1000,
           hideProgressBar: false,
           closeOnClick: true,
-          pauseOnHover: true,
+          pauseOnHover: false,
           draggable: true,
           progress: undefined,
           theme: "light",
@@ -51,12 +51,13 @@ export default function Login() {
         });
       }
     } catch (error) {
+      console.log(error);
       toast.error(error?.response?.data?.data?.error, {
         position: "top-right",
         autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: true,
+        pauseOnHover: false,
         draggable: true,
         progress: undefined,
         theme: "light",
