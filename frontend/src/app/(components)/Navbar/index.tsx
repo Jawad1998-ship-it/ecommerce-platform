@@ -13,7 +13,7 @@ import Link from "next/link";
 import { AxiosResponse } from "axios";
 import Image from "next/image";
 import Loading from "@/app/loading";
-import SearchBar from "./SearchBar";
+import SearchBar from "./SearchBar/SearchBar";
 import SubMenu from "./SubMenu";
 
 interface Product {
