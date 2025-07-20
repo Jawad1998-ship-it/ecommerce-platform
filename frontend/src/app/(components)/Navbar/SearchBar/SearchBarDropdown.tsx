@@ -9,10 +9,9 @@ export default function SearchBarDropdown({
   value,
   onChange,
   options,
-  className = "",
   onDropdownClose,
-  showBackdrop, // Add this prop
-  onBackdropClick, // Add this prop
+  showBackdrop,
+  onBackdropClick,
 }) {
   const [isOpen, setIsOpen] =
     useState(false);
@@ -74,7 +73,9 @@ export default function SearchBarDropdown({
   return (
     <div
       ref={dropdownRef}
-      className={`relative ${className}`}
+      className={`${
+        showBackdrop && `z-[11111]`
+      } relative w-[290px]`}
       onClick={handleDropdownClick}
     >
       {/* Dropdown Button */}
@@ -84,9 +85,9 @@ export default function SearchBarDropdown({
           e.preventDefault();
           setIsOpen(!isOpen);
         }}
-        className="max-w-[200px] bg-gray-200 text-gray-700 text-sm font-medium rounded-l-lg px-4 pr-8 py-2.5 cursor-pointer focus:outline-none border border-gray-300 flex items-center justify-between min-h-[44px] relative"
+        className="bg-gray-200 text-gray-700 text-sm font-medium rounded-l-lg px-4 pr-8 py-2.5 cursor-pointer focus:outline-none border border-gray-300 flex items-center justify-between min-h-[44px] relative"
         style={{
-          zIndex: isOpen ? 1001 : 1,
+          zIndex: isOpen ? 1001 : 11111,
         }}
       >
         <span className="flex-1 w-[100px] truncate leading-tight">

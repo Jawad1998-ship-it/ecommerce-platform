@@ -117,22 +117,18 @@ export default function SearchBar() {
           className="flex items-center bg-white rounded-lg shadow-md border border-gray-300"
           ref={searchBarRef}
         >
-          <div className="w-[400px]">
-            <SearchBarDropdown
-              value={category}
-              onChange={setCategory}
-              options={categoryOptions}
-              onDropdownClose={
-                handleDropdownClose
-              }
-              showBackdrop={
-                showBackdrop
-              }
-              onBackdropClick={
-                handleBackdropClick
-              }
-            />
-          </div>
+          <SearchBarDropdown
+            value={category}
+            onChange={setCategory}
+            options={categoryOptions}
+            onDropdownClose={
+              handleDropdownClose
+            }
+            showBackdrop={showBackdrop}
+            onBackdropClick={
+              handleBackdropClick
+            }
+          />
           <input
             ref={searchInputRef}
             type="text"
@@ -145,11 +141,18 @@ export default function SearchBar() {
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             placeholder="Search Products"
-            className="w-full px-4 py-2.5 text-gray-900 text-sm focus:outline-none"
+            className={`${
+              showBackdrop &&
+              `z-[11111]`
+            } w-full px-4 py-2.5 text-gray-900 text-sm focus:outline-none`}
           />
           <button
             type="submit"
-            className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-4 py-2.5 rounded-r-lg flex items-center justify-center"
+            className={`${
+              showBackdrop &&
+              `z-[11111]`
+            } bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-4 py-2.5 rounded-r-lg 
+            flex items-center justify-center`}
           >
             <svg
               className="w-5 h-5"
