@@ -3,7 +3,10 @@ export interface ThemeState {
 }
 
 export interface AxiosContextReturn {
-  post: (url: string, data?: object) => Promise;
+  post: (
+    url: string,
+    data?: object
+  ) => Promise;
   loading: boolean;
 }
 
@@ -42,7 +45,9 @@ export interface Product {
   brand?: string;
   category?: string;
   features?: string[];
-  attributes?: { [key: string]: string | string[] };
+  attributes?: {
+    [key: string]: string | string[];
+  };
   isInStock?: boolean;
   originalPrice?: number;
   cloudinaryPublicIds?: string[];
@@ -54,6 +59,10 @@ export interface ProductDetailsSectionProps {
   product: Product;
   totalRatings: number;
   ratingDistribution: number[];
+  isTryOnOpen: boolean;
+  setIsTryOnOpen: (
+    isOpen: boolean
+  ) => void;
 }
 
 export interface CartItem {
@@ -69,7 +78,9 @@ export interface CartItem {
 export interface InitialStateTypes {
   isSidebarCollapsed: boolean;
   currentUser: object;
-  cartItems: { [key: string]: CartItem };
+  cartItems: {
+    [key: string]: CartItem;
+  };
   loading: boolean;
 }
 
