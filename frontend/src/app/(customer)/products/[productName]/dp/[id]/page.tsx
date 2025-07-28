@@ -1,8 +1,5 @@
 "use client";
-import React, {
-  useState,
-  useEffect,
-} from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppSelector } from "@/app/redux";
@@ -11,7 +8,6 @@ import AddToCartSection from "@/app/(components)/Cart";
 import ReviewsSection from "@/app/(components)/Review";
 import ProductDetailsSection from "@/app/(components)/ProductDetails";
 import ProductImageZoom from "@/app/(components)/ProductImageZoom";
-import TryItOn from "@/app/(components)/TryItOn/TryItOn";
 import useAxios from "@/context/axiosContext";
 import { toast } from "react-toastify";
 
@@ -48,24 +44,21 @@ const reviews = [
     id: 1,
     reviewer: "John Doe",
     rating: 5,
-    comment:
-      "This jacket is amazing! Keeps me warm and looks stylish.",
+    comment: "This jacket is amazing! Keeps me warm and looks stylish.",
     date: "March 15, 2025",
   },
   {
     id: 2,
     reviewer: "Jane Smith",
     rating: 4,
-    comment:
-      "Good quality, but the fit is a bit tight for me.",
+    comment: "Good quality, but the fit is a bit tight for me.",
     date: "March 10, 2025",
   },
   {
     id: 3,
     reviewer: "Alex Brown",
     rating: 3,
-    comment:
-      "Decent jacket, but the zipper feels a bit flimsy.",
+    comment: "Decent jacket, but the zipper feels a bit flimsy.",
     date: "March 5, 2025",
   },
 ];
@@ -74,68 +67,38 @@ const ProductDetails = () => {
   const params = useParams();
   const { id, productName } = params;
   const { get, loading } = useAxios();
-  const [products, setProducts] =
-    useState<Product[]>([]);
-  const [error, setError] = useState<
-    string | null
-  >(null);
-  const [isTryOnOpen, setIsTryOnOpen] =
-    useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   // Get user from Redux store
-  const user = useAppSelector(
-    (state) => state.global.currentUser
-  );
+  const user = useAppSelector((state) => state.global.currentUser);
 
   const rating = 4.3;
   const totalRatings = 10087;
-  const ratingDistribution = [
-    6657, 1513, 908, 303, 706,
-  ]; // 5★, 4★, 3★, 2★, 1★
+  const ratingDistribution = [6657, 1513, 908, 303, 706]; // 5★, 4★, 3★, 2★, 1★
 
   // Fetch products using useAxios
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await get(
-          "/products/all-products"
-        );
+        const response = await get("/products/all-products");
         // console.log(response?.data);
-        if (
-          response?.status === 200 ||
-          response?.status === 201
-        ) {
-          setProducts(
-            response?.data?.data
-              ?.products || []
-          );
+        if (response?.status === 200 || response?.status === 201) {
+          setProducts(response?.data?.data?.products || []);
         } else {
-          throw new Error(
-            "Failed to fetch products"
-          );
+          throw new Error("Failed to fetch products");
         }
       } catch (error) {
-        console.error(
-          "Error fetching products:",
-          error
-        );
-        setError(
-          "Failed to load products"
-        );
-        toast.error(
-          "Failed to load products"
-        );
+        console.error("Error fetching products:", error);
+        setError("Failed to load products");
+        toast.error("Failed to load products");
       }
     };
     fetchProducts();
   }, []);
 
   // Find the product by _id - handle non-numeric ID safely
-  const product = id
-    ? products?.find(
-        (p) => p._id === id
-      )
-    : null;
+  const product = id ? products?.find((p) => p._id === id) : null;
 
   // Handle loading state
   if (loading) {
@@ -171,8 +134,7 @@ const ProductDetails = () => {
       <div className="min-h-screen">
         <main className="mainContainer mx-auto py-8">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-            {error ||
-              "Product Not Found"}
+            {error || "Product Not Found"}
           </h1>
           <Link
             href="/"
@@ -191,10 +153,7 @@ const ProductDetails = () => {
         <div className="flex gap-8">
           {/* Left Section: Product Image with Zoom */}
           <ProductImageZoom
-            imageSrc={
-              product?.imageUrls?.[0] ||
-              ""
-            }
+            imageSrc={product?.imageUrls?.[0] || ""}
             imageAlt={product?.name}
           />
 
@@ -203,30 +162,18 @@ const ProductDetails = () => {
             product={product}
             rating={rating}
             totalRatings={totalRatings}
-            ratingDistribution={
-              ratingDistribution
-            }
-            isTryOnOpen={isTryOnOpen}
-            setIsTryOnOpen={
-              setIsTryOnOpen
-            }
+            ratingDistribution={ratingDistribution}
           />
 
           {/* Right Section: Add to Cart/Buy Now */}
-          <AddToCartSection
-            product={product}
-          />
+          <AddToCartSection product={product} />
         </div>
 
         {/* Seller Promotion Section */}
         <div className="mt-12">
           <p className="text-gray-600 dark:text-gray-300">
-            New to Amazon: Introducing
-            Michael Kors{" "}
-            <Link
-              href="/home"
-              className="text-blue-500 hover:underline"
-            >
+            New to Amazon: Introducing Michael Kors{" "}
+            <Link href="/home" className="text-blue-500 hover:underline">
               Shop now
             </Link>
           </p>
@@ -236,9 +183,7 @@ const ProductDetails = () => {
         <ReviewsSection
           rating={rating}
           totalRatings={totalRatings}
-          ratingDistribution={
-            ratingDistribution
-          }
+          ratingDistribution={ratingDistribution}
           reviews={reviews}
           user={user}
           productName={productName}
@@ -248,14 +193,6 @@ const ProductDetails = () => {
         {/* Related Products Section */}
         {/* <RelatedProducts products={products} /> */}
       </main>
-      {isTryOnOpen && (
-        <TryItOn
-          product={product}
-          onClose={() =>
-            setIsTryOnOpen(false)
-          }
-        />
-      )}
     </div>
   );
 };

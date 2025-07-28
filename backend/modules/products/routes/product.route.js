@@ -52,15 +52,6 @@ productRouter.post(
   userPhotoUploadMulter,
   productController.uploadImage
 );
-productRouter.post(
-  "/try-it-on",
-  userPhotoUploadMulter,
-  productController.tryOn
-);
-
 export default (app) => {
-  app.use(
-    "/api/products",
-    productRouter
-  );
+  app.use("/api/products", productRouter);
 };

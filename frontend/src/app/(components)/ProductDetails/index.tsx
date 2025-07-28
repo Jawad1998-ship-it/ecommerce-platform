@@ -43,57 +43,36 @@ const EmptyStar = () => (
   </svg>
 );
 
-const ProductDetailsSection: React.FC<
-  ProductDetailsSectionProps
-> = ({
+const ProductDetailsSection: React.FC<ProductDetailsSectionProps> = ({
   product,
   totalRatings,
   ratingDistribution,
-  isTryOnOpen,
-  setIsTryOnOpen,
 }) => {
-  const [
-    isRatingPopupOpen,
-    setIsRatingPopupOpen,
-  ] = useState(false);
-  const [
-    showMoreSpecs,
-    setShowMoreSpecs,
-  ] = useState(false);
+  const [isRatingPopupOpen, setIsRatingPopupOpen] = useState(false);
+  const [showMoreSpecs, setShowMoreSpecs] = useState(false);
 
   const toggleShowMoreSpecs = () => {
     setShowMoreSpecs(!showMoreSpecs);
   };
 
   // Function to render stars based on rating
-  const renderStars = (
-    rating: number = 3.5
-  ) => {
-    const fullStars =
-      Math.floor(rating); // Number of full stars
-    const hasHalfStar =
-      rating % 1 >= 0.5; // Check for half star
-    const emptyStars =
-      5 -
-      fullStars -
-      (hasHalfStar ? 1 : 0); // Remaining empty stars
+  const renderStars = (rating: number = 3.5) => {
+    const fullStars = Math.floor(rating); // Number of full stars
+    const hasHalfStar = rating % 1 >= 0.5; // Check for half star
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0); // Remaining empty stars
 
     return (
       <div className="flex items-center">
         {Array(fullStars)
           .fill(null)
           .map((_, index) => (
-            <FullStar
-              key={`full-${index}`}
-            />
+            <FullStar key={`full-${index}`} />
           ))}
         {hasHalfStar && <HalfStar />}
         {Array(emptyStars)
           .fill(null)
           .map((_, index) => (
-            <EmptyStar
-              key={`empty-${index}`}
-            />
+            <EmptyStar key={`empty-${index}`} />
           ))}
       </div>
     );
@@ -109,20 +88,13 @@ const ProductDetailsSection: React.FC<
           ?.split(" ")
           ?.map(
             (word) =>
-              word
-                ?.charAt(0)
-                ?.toUpperCase() +
-              word
-                ?.slice(1)
-                ?.toLowerCase()
+              word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase()
           )
           ?.join(" ") || ""}
       </p>
       <div
         className="flex items-center mb-4 cursor-pointer"
-        onClick={() =>
-          setIsRatingPopupOpen(true)
-        }
+        onClick={() => setIsRatingPopupOpen(true)}
       >
         {/* {renderStars(product?.rating)} */}
         {/* <span className="ml-2 text-gray-600 dark:text-gray-300">
@@ -132,14 +104,10 @@ const ProductDetailsSection: React.FC<
       </div>
       <RatingPopup
         isOpen={isRatingPopupOpen}
-        onClose={() =>
-          setIsRatingPopupOpen(false)
-        }
+        onClose={() => setIsRatingPopupOpen(false)}
         rating={product.rating}
         totalRatings={totalRatings}
-        ratingDistribution={
-          ratingDistribution
-        }
+        ratingDistribution={ratingDistribution}
       />
       <div className="mb-4">
         <p className="text-xl font-semibold text-gray-800 dark:text-white">
@@ -147,42 +115,32 @@ const ProductDetailsSection: React.FC<
         </p>
         {product?.originalPrice && (
           <p className="text-sm text-gray-500 line-through">
-            List Price: $
-            {product?.originalPrice?.toFixed(
-              2
-            )}
+            List Price: ${product?.originalPrice?.toFixed(2)}
           </p>
         )}
         <p className="text-sm text-gray-600 dark:text-gray-300">
           $
           {(
-            ((product?.originalPrice -
-              product?.price) /
+            ((product?.originalPrice - product?.price) /
               product?.originalPrice) *
             100
           )?.toFixed(0)}
           % off
         </p>
       </div>
-      <p className="text-green-600 dark:text-green-400 mb-4">
-        In Stock
-      </p>
+      <p className="text-green-600 dark:text-green-400 mb-4">In Stock</p>
       <p className="text-gray-600 dark:text-gray-300 mb-2">
         Ships from: Ecommerce
       </p>
       <p className="text-gray-600 dark:text-gray-300 mb-4">
-        Sold by: {product?.brand}{" "}
-        AUTHORIZED
+        Sold by: {product?.brand} AUTHORIZED
       </p>
       <p className="text-gray-600 dark:text-gray-300 mb-4">
         30-day return/refund/replacement
       </p>
       <div className="mb-4">
         <p className="text-gray-600 dark:text-gray-300">
-          <span className="font-semibold">
-            Brand:
-          </span>{" "}
-          {product?.brand}
+          <span className="font-semibold">Brand:</span> {product?.brand}
         </p>
 
         {/* {showMoreSpecs && (
@@ -213,22 +171,10 @@ const ProductDetailsSection: React.FC<
           About this item
         </h2>
         <ul className="list-disc list-inside text-gray-600 dark:text-gray-300">
-          {product?.features?.map(
-            (feature, index) => (
-              <li key={index}>
-                {feature}
-              </li>
-            )
-          )}
+          {product?.features?.map((feature, index) => (
+            <li key={index}>{feature}</li>
+          ))}
         </ul>
-        <button
-          onClick={() =>
-            setIsTryOnOpen(true)
-          }
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          Try It On
-        </button>
       </div>
     </div>
   );
