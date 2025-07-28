@@ -5,8 +5,15 @@ import Coupon from "../../coupons/models/coupon.model.js";
 import { stripe } from "../../../lib/stripe.js";
 import { createStripeCoupon } from "../../../lib/createStripeCoupon.js";
 import { createCoupon } from "../../coupons/controllers/coupon.controller.js";
+import SSLCommerzPayment from "sslcommerz-lts";
+import { v4 as uuidv4 } from "uuid";
 
 const Payment = db.model.Payment;
+const OrderDetails = db.model.OrderDetails;
+
+const store_id = "testbox";
+const store_passwd = "qwerty";
+const is_live = false;
 
 export const createCheckoutSession = async (req, res) => {
   try {
@@ -123,6 +130,120 @@ export const checkoutSuccess = async (req, res) => {
       );
     }
   } catch (error) {
+    errorResponse(500, "ERROR", "Error processing successful checkout", res);
+  }
+};
+
+export const sslCommerzIpn = async (req, res) => {
+  try {
+    const data = req.body;
+    if (!data.tran_id) {
+      return errorResponse(400, "ERROR", "Transaction ID not found", res);
+    }
+    const updatedOrder = await OrderDetails.findOneAndUpdate(
+      { transactionId: data.tran_id },
+      { status: "Complete", paymentMethod: "sslcommerz" },
+      { new: true }
+    );
+    successResponse(
+      200,
+      "SUCCESS",
+      {
+        message: "Payment successful, order created.",
+        order_id: updatedOrder._id,
+      },
+      res
+    );
+  } catch (error) {
+    errorResponse(500, "ERROR", "Error processing successful checkout", res);
+  }
+};
+
+export const initiateSslCommerzPayment = async (req, res) => {
+  try {
+    const { orderData, customerData, orderItems } = req.body;
+    const tran_id = uuidv4();
+    const data = {
+      total_amount: orderData.total,
+      currency: "BDT",
+      tran_id: tran_id, // use unique tran_id for each api call
+      success_url: `${process.env.NEXT_APP_FRONTEND}/payment/success?transactionId=${tran_id}`,
+      fail_url: `${process.env.NEXT_APP_FRONTEND}/payment/fail?transactionId=${tran_id}`,
+      cancel_url: `${process.env.NEXT_APP_FRONTEND}/payment/cancel?transactionId=${tran_id}`,
+      ipn_url: "http://localhost:3030/ipn",
+      shipping_method: "Courier",
+      product_name: "Computer.",
+      product_category: "Electronic",
+      product_profile: "general",
+      cus_name: `${customerData.firstName} ${customerData.lastName}`,
+      cus_email: customerData.email,
+      cus_add1: customerData.address,
+      cus_add2: customerData.address,
+      cus_city: customerData.city,
+      cus_state: customerData.city,
+      cus_postcode: "1000",
+      cus_country: customerData.country,
+      cus_phone: customerData.phone,
+      cus_fax: customerData.phone,
+      ship_name: `${customerData.firstName} ${customerData.lastName}`,
+      ship_add1: customerData.address,
+      ship_add2: customerData.address,
+      ship_city: customerData.city,
+      ship_state: customerData.city,
+      ship_postcode: 1000,
+      ship_country: customerData.country,
+    };
+
+    const newOrderDetailsData = {
+      ...customerData,
+      orderItems: orderItems.map((item) => ({
+        productId: item.productId,
+        name: item.name,
+        price: item.price,
+        subtotal: item.subtotal,
+        quantity: item.quantity,
+      })),
+      orderSummary: {
+        itemsSubtotal: orderData.subtotal,
+        shipping: orderData.shipping,
+        total: orderData.total,
+      },
+      paymentMethod: "sslcommerz",
+      status: "Pending",
+      transactionId: tran_id,
+    };
+
+    await OrderDetails.create(newOrderDetailsData);
+
+    const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
+    sslcz.init(data).then((apiResponse) => {
+      // Redirect the user to payment gateway
+      console.log("apiResponse", apiResponse);
+      let GatewayPageURL = apiResponse.GatewayPageURL;
+      res.send({ url: GatewayPageURL });
+    });
+  } catch (error) {
+    errorResponse(500, "ERROR", "Error processing successful checkout", res);
+  }
+};
+
+export const paymentSuccess = async (req, res) => {
+  try {
+    const { transactionId } = req.query;
+    if (!transactionId) {
+      return errorResponse(400, "ERROR", "Transaction ID not found", res);
+    }
+    const updatedOrder = await OrderDetails.findOneAndUpdate(
+      { transactionId },
+      { status: "Complete", paymentMethod: "sslcommerz" },
+      { new: true }
+    );
+    if (!updatedOrder) {
+      return errorResponse(404, "ERROR", "Order not found", res);
+    }
+    res.redirect(`${process.env.NEXT_APP_FRONTEND}/`);
+  } catch (error) {
+    console.error("Payment success error:", error);
     errorResponse(500, "ERROR", "Error processing successful checkout", res);
   }
 };
