@@ -1,4 +1,4 @@
-import SSLCommerzPayment from "sslcommerz-lts";
+import SsSslcommerz from "ss-sslcommerz";
 
 const sslCommerzConfig = {
   store_id:
@@ -10,6 +10,6 @@ const sslCommerzConfig = {
 };
 
 export {
-  SSLCommerzPayment,
+  SsSslcommerz,
   sslCommerzConfig,
 };
