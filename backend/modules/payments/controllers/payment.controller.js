@@ -5,7 +5,7 @@ import Coupon from "../../coupons/models/coupon.model.js";
 import { stripe } from "../../../lib/stripe.js";
 import { createStripeCoupon } from "../../../lib/createStripeCoupon.js";
 import { createCoupon } from "../../coupons/controllers/coupon.controller.js";
-import SsSslcommerz from "ss-sslcommerz";
+import SSLCommerzPayment from "sslcommerz-lts";
 import { v4 as uuidv4 } from "uuid";
 
 const Payment = db.model.Payment;
@@ -215,7 +215,7 @@ export const initiateSslCommerzPayment = async (req, res) => {
 
     await OrderDetails.create(newOrderDetailsData);
 
-    const sslcz = new SsSslcommerz(store_id, store_passwd, is_live);
+    const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
     sslcz.init(data).then((apiResponse) => {
       // Redirect the user to payment gateway
       console.log("apiResponse", apiResponse);
