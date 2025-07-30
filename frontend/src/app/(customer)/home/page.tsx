@@ -88,7 +88,7 @@ const Home = () => {
 
   return (
     <div className={`min-h-screen ${theme === "dark" ? "dark" : ""}`}>
-      <main className="mainContainer mx-auto pt-10 pb-6 sm:pt-15 sm:pb-8">
+      <main className="mx-auto pt-10 pb-6 sm:pt-15 sm:pb-8">
         <section className="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden mb-6 sm:mb-8">
           <div className="flex flex-col md:flex-row items-center justify-center">
             <div className="w-full text-center md:w-1/2 p-4 sm:p-6 md:p-8">

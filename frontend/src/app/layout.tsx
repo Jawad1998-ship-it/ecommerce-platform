@@ -14,7 +14,7 @@ export default function RootLayout({
         content="width=device-width, initial-scale=1.0, user-scalable=no"
       />
       <body>
-        <div className="mainContainer">
+        <div>
           <ReduxWrapper>
             <LoadingProvider>{children}</LoadingProvider>
           </ReduxWrapper>

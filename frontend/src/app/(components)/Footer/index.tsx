@@ -5,9 +5,9 @@ import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="max-h-[380px] bg-gray-800 text-gray-300 py-5 mt-[100px]">
-      <div className="mainContainer mx-auto px-6">
-        <div className="grid grid-cols-4 gap-8 mb-8">
+    <footer className="bg-gray-800 text-gray-300 py-8 mt-16 md:mt-24">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8">
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">
               Get to Know Us
@@ -152,10 +152,10 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-white mb-2">
               Get the App
             </h3>
-            <p className="text-sm mb-2">
+            <p className="text-sm mb-4">
               Download our app for a better shopping experience!
             </p>
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
               <Link
                 href="https://play.google.com"
                 target="_blank"
@@ -190,8 +190,8 @@ const Footer = () => {
 
         <hr className="border-gray-600 mb-6" />
 
-        <div className="flex flex-col md:flex-row justify-between items-center text-sm">
-          <div className="flex flex-wrap gap-4 mb-4 md:mb-0">
+        <div className="flex flex-col items-center text-sm space-y-4 sm:flex-row sm:justify-between sm:space-y-0">
+          <div className="flex flex-wrap justify-center gap-4">
             <Link href="/privacy" className="hover:text-white transition">
               Privacy Policy
             </Link>

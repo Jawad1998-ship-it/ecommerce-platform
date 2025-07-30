@@ -1,9 +1,5 @@
 "use client";
-import {
-  useState,
-  useRef,
-  useEffect,
-} from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function SearchBarDropdown({
   value,
@@ -13,17 +9,12 @@ export default function SearchBarDropdown({
   showBackdrop,
   onBackdropClick,
 }) {
-  const [isOpen, setIsOpen] =
-    useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const selectedOption = options.find(
-    (option) => option.value === value
-  );
+  const selectedOption = options.find((option) => option.value === value);
 
-  const handleSelect = (
-    optionValue
-  ) => {
+  const handleSelect = (optionValue) => {
     console.log(optionValue);
     onChange(optionValue);
     setIsOpen(false);
@@ -38,29 +29,16 @@ export default function SearchBarDropdown({
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (
-      event
-    ) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(
-          event.target
-        )
-      ) {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
         // Don't call onDropdownClose here since parent handles backdrop
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside
-    );
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -73,9 +51,7 @@ export default function SearchBarDropdown({
   return (
     <div
       ref={dropdownRef}
-      className={`${
-        showBackdrop && `z-[11111]`
-      } relative w-[290px]`}
+      className={`${showBackdrop && `z-[11111]`} relative w-[290px]`}
       onClick={handleDropdownClick}
     >
       {/* Dropdown Button */}
@@ -85,7 +61,7 @@ export default function SearchBarDropdown({
           e.preventDefault();
           setIsOpen(!isOpen);
         }}
-        className="bg-gray-200 text-gray-700 text-sm font-medium rounded-l-lg px-4 pr-8 py-2.5 cursor-pointer focus:outline-none border border-gray-300 flex items-center justify-between min-h-[44px] relative"
+        className="bg-gray-200 text-gray-700 text-sm font-medium rounded-l-lg px-4 pr-8 cursor-pointer focus:outline-none border border-gray-300 flex items-center justify-between h-11 relative"
         style={{
           zIndex: isOpen ? 1001 : 11111,
         }}
@@ -95,9 +71,7 @@ export default function SearchBarDropdown({
         </span>
         <svg
           className={`w-4 h-4 ml-2 transition-transform flex-shrink-0 ${
-            isOpen
-              ? "transform rotate-180"
-              : ""
+            isOpen ? "transform rotate-180" : ""
           }`}
           fill="none"
           stroke="currentColor"
@@ -125,14 +99,10 @@ export default function SearchBarDropdown({
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                handleSelect(
-                  option.value
-                );
+                handleSelect(option.value);
               }}
               className={`w-full truncate px-4 py-2.5 cursor-pointer hover:bg-gray-100 text-sm text-gray-700 break-words leading-tight ${
-                value === option.value
-                  ? "bg-blue-50 text-blue-700"
-                  : ""
+                value === option.value ? "bg-blue-50 text-blue-700" : ""
               }`}
             >
               {option.label}

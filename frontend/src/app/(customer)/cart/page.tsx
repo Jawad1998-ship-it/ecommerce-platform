@@ -119,7 +119,7 @@ const CartPage = () => {
 
   return (
     <div className={`${theme} min-h-screen flex flex-col`}>
-      <main className="mainContainer mx-auto max-w-7xl w-full">
+      <main className="mx-auto max-w-7xl w-full">
         <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 border-b-2 border-gray-300 pb-1 w-full">
           Shopping Cart
         </h1>

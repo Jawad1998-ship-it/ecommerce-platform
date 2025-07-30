@@ -274,13 +274,14 @@ const OrderDetails = () => {
                         as="select"
                         id="country"
                         name="country"
-                        className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
+                        className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white 
+                        dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
                         onChange={(e) => {
                           setFieldValue("country", e.target.value);
                           setSelectedCountry(e.target.value);
                         }}
                       >
-                        <option value="">Select a country</option>
+                        <option value="">Select Country</option>
                         {countries?.map((country) => (
                           <option
                             key={country?._id || country?.country_name}

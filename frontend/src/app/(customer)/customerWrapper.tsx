@@ -15,8 +15,10 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen w-full min-w-[1200px] bg-gray-50 text-gray-900">
-      <main className={`${theme} flex flex-col h-full w-full bg-gray-50`}>
+    <div className="flex flex-col min-h-screen w-full bg-gray-50 text-gray-900">
+      <main
+        className={`${theme} flex flex-col h-full w-full bg-gray-50`}
+      >
         <Navbar />
         <ToastContainer />
         <div className="w-full px-6">{children}</div>

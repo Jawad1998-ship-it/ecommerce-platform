@@ -132,7 +132,7 @@ const ProductDetails = () => {
   if (error || !product) {
     return (
       <div className="min-h-screen">
-        <main className="mainContainer mx-auto py-8">
+        <main className="mx-auto py-8">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
             {error || "Product Not Found"}
           </h1>
@@ -149,7 +149,7 @@ const ProductDetails = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <main className="mainContainer mx-auto py-8 flex-grow">
+      <main className="mx-auto py-8 flex-grow">
         <div className="flex gap-8">
           {/* Left Section: Product Image with Zoom */}
           <ProductImageZoom

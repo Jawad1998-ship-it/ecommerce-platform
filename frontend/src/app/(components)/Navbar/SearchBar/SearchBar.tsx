@@ -1,25 +1,14 @@
 "use client";
 
-import {
-  useState,
-  useRef,
-  useEffect,
-} from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAppSelector } from "@/app/redux";
 import SearchBarDropdown from "./SearchBarDropdown";
 
 export default function SearchBar() {
-  const user = useAppSelector(
-    (state) => state.global.currentUser
-  );
-  const [searchQuery, setSearchQuery] =
-    useState("");
-  const [category, setCategory] =
-    useState("all");
-  const [
-    showBackdrop,
-    setShowBackdrop,
-  ] = useState(false);
+  const user = useAppSelector((state) => state.global.currentUser);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [showBackdrop, setShowBackdrop] = useState(false);
 
   // Add ref for the search input
   const searchInputRef = useRef(null);
@@ -41,8 +30,7 @@ export default function SearchBar() {
     },
     {
       value: "home",
-      label:
-        "Home & Kitchen lorrrrrrrxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      label: "Home & Kitchen lorrrrrrrxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     },
   ];
 
@@ -83,28 +71,18 @@ export default function SearchBar() {
 
   // Handle clicks outside the search bar area
   useEffect(() => {
-    const handleClickOutside = (
-      event
-    ) => {
+    const handleClickOutside = (event) => {
       if (
         searchBarRef.current &&
-        !searchBarRef.current.contains(
-          event.target
-        )
+        !searchBarRef.current.contains(event.target)
       ) {
         setShowBackdrop(false);
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside
-    );
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -121,38 +99,28 @@ export default function SearchBar() {
             value={category}
             onChange={setCategory}
             options={categoryOptions}
-            onDropdownClose={
-              handleDropdownClose
-            }
+            onDropdownClose={handleDropdownClose}
             showBackdrop={showBackdrop}
-            onBackdropClick={
-              handleBackdropClick
-            }
+            onBackdropClick={handleBackdropClick}
           />
           <input
             ref={searchInputRef}
             type="text"
             value={searchQuery}
-            onChange={(e) =>
-              setSearchQuery(
-                e.target.value
-              )
-            }
+            onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             placeholder="Search Products"
             className={`${
-              showBackdrop &&
-              `z-[11111]`
-            } w-full px-4 py-2.5 text-gray-900 text-sm focus:outline-none`}
+              showBackdrop && `z-[11111]`
+            } w-full px-4 text-gray-900 text-sm focus:outline-none h-11`}
           />
           <button
             type="submit"
             className={`${
-              showBackdrop &&
-              `z-[11111]`
-            } bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-4 py-2.5 rounded-r-lg 
-            flex items-center justify-center`}
+              showBackdrop && `z-[11111]`
+            } bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-4 rounded-r-lg 
+            flex items-center justify-center h-11`}
           >
             <svg
               className="w-5 h-5"
@@ -178,11 +146,7 @@ export default function SearchBar() {
           <input
             type="search"
             value={searchQuery}
-            onChange={(e) =>
-              setSearchQuery(
-                e.target.value
-              )
-            }
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name or payment ID"
             className="w-full px-4 py-2.5 text-gray-900 text-sm focus:outline-none rounded-l-lg"
           />

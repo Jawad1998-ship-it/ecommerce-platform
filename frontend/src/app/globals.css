@@ -33,21 +33,13 @@
 
 html,
 body {
-  /* min-width: 600px;
-  width: 100vw;
+  /* min-width: 600px; */
+  /* width: 100vw;
   min-height: 100vh; */
   margin: 0;
   padding: 0;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   text-size-adjust: 100%;
-}
-/* container */
-.mainContainer {
-  width: 100%;
-  min-height: 100%;
-  max-width: none;
-  min-width: 600px;
-  margin: 0 auto;
 }
 
 /* Navigation Styles */
