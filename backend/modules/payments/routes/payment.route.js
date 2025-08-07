@@ -18,18 +18,10 @@ PaymentRouter.post(
   "/initiate-ssl-commerz",
   PaymentController.initiateSslCommerzPayment
 );
-PaymentRouter.post(
-  "/payment/success",
-  PaymentController.paymentSuccess
-);
-PaymentRouter.post(
-  "/ipn",
-  PaymentController.sslCommerzIpn
-);
+PaymentRouter.post("/payment/success", PaymentController.paymentSuccess);
+PaymentRouter.post("/ipn", PaymentController.sslCommerzIpn);
+PaymentRouter.post("/payment/cancel", PaymentController.paymentCancel);
 
 export default (app) => {
-  app.use(
-    "/api/payments",
-    PaymentRouter
-  );
+  app.use("/api/payments", PaymentRouter);
 };

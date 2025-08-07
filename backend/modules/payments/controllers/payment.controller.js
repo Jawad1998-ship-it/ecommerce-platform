@@ -134,6 +134,23 @@ export const checkoutSuccess = async (req, res) => {
   }
 };
 
+export const paymentCancel = async (req, res) => {
+  try {
+    const { transactionId } = req.query;
+    if (!transactionId) {
+      return errorResponse(400, "ERROR", "Transaction ID not found", res);
+    }
+    await OrderDetails.findOneAndUpdate(
+      { transactionId },
+      { status: "Cancelled" },
+      { new: true }
+    );
+    res.redirect(`${process.env.NEXT_APP_FRONTEND}/`);
+  } catch (error) {
+    errorResponse(500, "ERROR", "Error processing checkout cancellation", res);
+  }
+};
+
 export const sslCommerzIpn = async (req, res) => {
   try {
     const data = req.body;
