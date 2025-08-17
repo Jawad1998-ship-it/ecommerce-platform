@@ -1,6 +1,7 @@
 import db from "../../../config/database.config.js";
 import errorResponse from "../../../utils/errorResponse.js";
 import successResponse from "../../../utils/successResponse.js";
+import { updateProfile, updatePassword } from "./userSettings.controller.js";
 
 const User = db.model.User;
 
@@ -229,3 +230,6 @@ export const uploadImage = async (req, res) => {
     );
   }
 };
+
+// Export the settings controller methods
+export { updateProfile, updatePassword };

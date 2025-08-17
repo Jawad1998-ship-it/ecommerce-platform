@@ -3,8 +3,7 @@ import errorResponse from "../../../utils/errorResponse.js";
 import successResponse from "../../../utils/successResponse.js";
 import { redis } from "../../../lib/redis.js";
 import cloudinary from "../../../lib/cloudinary.js";
-
-const Product = db.model.Product;
+import Product from "../models/product.model.js";
 
 export const createProduct = async (req, res) => {
   try {
@@ -596,6 +595,105 @@ export const uploadImage = async (req, res) => {
       "ERROR",
       err.message ||
         "Some error occurred while Finding Users By Date_of_Birth.",
+      res
+    );
+  }
+};
+
+export const searchProducts = async (req, res) => {
+  try {
+    const { query, category, page = 1, limit = 20 } = req.query;
+
+    // Validate search query
+    if (!query || query.trim() === '') {
+      return errorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "Search query is required",
+        res
+      );
+    }
+
+    const searchTerm = query.trim();
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Build search criteria
+    let searchCriteria = {
+      isInStock: true, // Only show in-stock items
+    };
+
+    // Category filter
+    if (category && category !== 'all') {
+      searchCriteria.category = category;
+    }
+
+    // Create text search conditions
+    const textSearchConditions = [
+      { name: { $regex: searchTerm, $options: 'i' } },
+      { description: { $regex: searchTerm, $options: 'i' } },
+      { brand: { $regex: searchTerm, $options: 'i' } },
+      { category: { $regex: searchTerm, $options: 'i' } },
+      { category_name: { $regex: searchTerm, $options: 'i' } },
+      { features: { $elemMatch: { $regex: searchTerm, $options: 'i' } } },
+    ];
+
+    // Add attributes search for common attribute keys
+    const commonAttributes = ['color', 'size', 'material', 'type', 'style'];
+    commonAttributes.forEach(attr => {
+      textSearchConditions.push({
+        [`attributes.${attr}`]: { $regex: searchTerm, $options: 'i' }
+      });
+    });
+
+    // Combine search criteria
+    searchCriteria.$or = textSearchConditions;
+
+    // Execute search with pagination
+    const [products, totalCount] = await Promise.all([
+      Product.find(searchCriteria)
+        .select('-cloudinaryPublicIds')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      Product.countDocuments(searchCriteria)
+    ]);
+
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalCount / limitNum);
+    const hasNextPage = pageNum < totalPages;
+    const hasPrevPage = pageNum > 1;
+
+    successResponse(
+      200,
+      "SUCCESS",
+      {
+        products,
+        pagination: {
+          currentPage: pageNum,
+          totalPages,
+          totalItems: totalCount,
+          itemsPerPage: limitNum,
+          hasNextPage,
+          hasPrevPage
+        },
+        searchInfo: {
+          query: searchTerm,
+          category: category || 'all',
+          resultsCount: products.length
+        }
+      },
+      res
+    );
+
+  } catch (error) {
+    console.error("Search error:", error);
+    errorResponse(
+      500,
+      "SERVER_ERROR",
+      error.message || "An error occurred while searching products",
       res
     );
   }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
 interface ProductImageZoomProps {
@@ -12,6 +12,7 @@ const ProductImageZoom = ({ imageSrc, imageAlt }: ProductImageZoomProps) => {
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [lensPosition, setLensPosition] = useState({ x: 0, y: 0 });
+  const [isOverlayActive, setIsOverlayActive] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
 
   //lens and zoomed window sizes
@@ -47,7 +48,9 @@ const ProductImageZoom = ({ imageSrc, imageAlt }: ProductImageZoomProps) => {
   };
 
   const handleMouseEnter = () => {
-    setIsZoomed(true);
+    if (!isOverlayActive) {
+      setIsZoomed(true);
+    }
   };
 
   const handleMouseLeave = () => {
@@ -72,6 +75,45 @@ const ProductImageZoom = ({ imageSrc, imageAlt }: ProductImageZoomProps) => {
   const handleTouchEnd = () => {
     setIsZoomed(false);
   };
+
+  // Monitor for backdrop/overlay elements
+  useEffect(() => {
+    const checkForOverlays = () => {
+      // Check for search backdrop specifically
+      const backdrop = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-30');
+      const isBackdropVisible = backdrop && window.getComputedStyle(backdrop).display !== 'none';
+      
+      // Check for any high z-index elements that might be overlays
+      const highZElements = document.querySelectorAll('[style*="z-index"]');
+      const hasHighZOverlay = Array.from(highZElements).some(el => {
+        const style = window.getComputedStyle(el);
+        const zIndex = parseInt(style.zIndex);
+        return zIndex > 100 && style.position === 'fixed' && style.display !== 'none';
+      });
+      
+      const overlayActive = !!(isBackdropVisible || hasHighZOverlay);
+      setIsOverlayActive(overlayActive);
+      
+      // If overlay becomes active and zoom is currently on, turn it off
+      if (overlayActive && isZoomed) {
+        setIsZoomed(false);
+      }
+    };
+
+    // Set up mutation observer to watch for DOM changes
+    const observer = new MutationObserver(checkForOverlays);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+
+    // Initial check
+    checkForOverlays();
+
+    return () => observer.disconnect();
+  }, [isZoomed]);
 
   //calculate image dimensions for zoom factor
   const imageWidth = imageRef.current?.getBoundingClientRect().width || 400;

@@ -28,6 +28,7 @@ const publicRoutes: string[] = [
   "/payment/success",
   "/payment/cancel",
   "/payment/fail",
+  "/search",
 ];
 const roleRoutes: RoleRoutes = {
   admin: [...privateRoutes, ...publicRoutes],

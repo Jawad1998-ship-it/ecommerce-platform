@@ -31,6 +31,10 @@ productRouter.get(
   productController.findAllRecommendedProducts
 );
 productRouter.get(
+  "/search",
+  productController.searchProducts
+);
+productRouter.get(
   "/:category",
   verifyToken,
   productController.findProductsByCategory

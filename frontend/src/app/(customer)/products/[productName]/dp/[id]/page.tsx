@@ -11,33 +11,6 @@ import ProductImageZoom from "@/app/(components)/ProductImageZoom";
 import useAxios from "@/context/axiosContext";
 import { toast } from "react-toastify";
 
-// Define the Product interface based on API response
-interface Product {
-  _id: string;
-  name: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  description: string;
-  brand: string;
-  color: string;
-  material: string;
-  compatibleDevices?: string;
-  screenSize?: string;
-  dimensions?: string;
-  batteryLife?: string;
-  sensorType?: string;
-  batteryDescription?: string;
-  features: string[];
-  attributes?: { color: string[] };
-  category?: string;
-  cloudinaryPublicIds?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-  imageUrls?: string[];
-  isInStock?: boolean;
-}
-
 // Mock data for reviews (unchanged)
 const reviews = [
   {
@@ -67,7 +40,7 @@ const ProductDetails = () => {
   const params = useParams();
   const { id, productName } = params;
   const { get, loading } = useAxios();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState([]);
   const [error, setError] = useState<string | null>(null);
 
   // Get user from Redux store
@@ -149,7 +122,7 @@ const ProductDetails = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <main className="mx-auto py-8 flex-grow">
+      <main className="mx-auto py-8 w-full">
         <div className="flex gap-8">
           {/* Left Section: Product Image with Zoom */}
           <ProductImageZoom

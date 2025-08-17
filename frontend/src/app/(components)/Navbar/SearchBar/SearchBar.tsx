@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useAppSelector } from "@/app/redux";
+import { useRouter } from "next/navigation";
 import SearchBarDropdown from "./SearchBarDropdown";
 
 export default function SearchBar() {
   const user = useAppSelector((state) => state.global.currentUser);
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [showBackdrop, setShowBackdrop] = useState(false);
@@ -36,10 +38,25 @@ export default function SearchBar() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Search submitted:", {
-      searchQuery,
-      category,
+    
+    // Validate search query
+    if (!searchQuery.trim()) {
+      return;
+    }
+
+    // Navigate to search results page with query parameters
+    const searchParams = new URLSearchParams({
+      query: searchQuery.trim(),
+      category: category
     });
+
+    router.push(`/search?${searchParams.toString()}`);
+    
+    // Clear backdrop and blur input after search
+    setShowBackdrop(false);
+    if (searchInputRef.current) {
+      searchInputRef.current.blur();
+    }
   };
 
   // Function to focus the search input after dropdown closes
