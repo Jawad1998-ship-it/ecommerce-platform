@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { Product } from "../../../types/types";
+import { Product, ProductTableProps } from "../../../types/types";
 import {
   createColumnHelper,
   flexRender,
@@ -10,26 +10,11 @@ import {
   useReactTable,
   ColumnDef,
 } from "@tanstack/react-table";
-import {
-  FiChevronUp,
-  FiChevronDown,
-  FiEdit,
-  FiTrash2,
-  FiImage,
-} from "react-icons/fi";
+import { FiChevronUp, FiChevronDown, FiEdit, FiTrash2, FiImage } from "react-icons/fi";
 
-interface ProductTableProps {
-  products: Product[];
-  onEdit: (product: Product) => void;
-  onDelete: (product: Product) => void;
-}
 const columnHelper = createColumnHelper<Product>();
 
-const ProductTable: React.FC<ProductTableProps> = ({
-  products,
-  onEdit,
-  onDelete,
-}) => {
+const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const formatPrice = (price?: number) =>
@@ -69,11 +54,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
         cell: (info) => (
           <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 bg-gray-50 rounded-sm flex items-center justify-center">
             {info.getValue() ? (
-              <img
-                className="h-full w-full rounded-sm object-contain"
-                src={info.getValue()}
-                alt="Thumb"
-              />
+              <img className="h-full w-full rounded-sm object-contain" src={info.getValue()} alt="Thumb" />
             ) : (
               <FiImage className="text-gray-300" size={16} />
             )}
@@ -98,9 +79,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       columnHelper.accessor("sku", {
         header: "SKU",
         cell: (info) => (
-          <span className="text-xs text-gray-500 bg-gray-100 px-1 py-0.5 rounded-sm">
-            {info.getValue()}
-          </span>
+          <span className="text-xs text-gray-500 bg-gray-100 px-1 py-0.5 rounded-sm">{info.getValue()}</span>
         ),
         size: 100,
         minSize: 80,
@@ -109,22 +88,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
       columnHelper.accessor((row) => row.category.name, {
         id: "categoryName",
         header: "Category",
-        cell: (info) => (
-          <span className="text-xs sm:text-sm text-gray-600 truncate">
-            {info.getValue()}
-          </span>
-        ),
+        cell: (info) => <span className="text-xs sm:text-sm text-gray-600 truncate">{info.getValue()}</span>,
         size: 120,
         minSize: 100,
         maxSize: 200,
       }),
       columnHelper.accessor("price", {
         header: "Price",
-        cell: (info) => (
-          <span className="text-xs sm:text-sm text-gray-600">
-            {formatPrice(info.getValue())}
-          </span>
-        ),
+        cell: (info) => <span className="text-xs sm:text-sm text-gray-600">{formatPrice(info.getValue())}</span>,
         size: 90,
         minSize: 80,
         maxSize: 120,
@@ -136,11 +107,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
           return (
             <span
               className={`text-xs sm:text-sm font-medium ${
-                stock < 10 && stock > 0
-                  ? "text-orange-600"
-                  : stock === 0
-                  ? "text-red-600"
-                  : "text-gray-700"
+                stock < 10 && stock > 0 ? "text-orange-600" : stock === 0 ? "text-red-600" : "text-gray-700"
               }`}
             >
               {stock === 0 ? "Out" : stock}
@@ -169,9 +136,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       columnHelper.accessor("lastUpdated", {
         header: "Updated",
         cell: (info) => (
-          <span className="text-xs text-gray-500 hidden sm:table-cell">
-            {formatDate(info.getValue())}
-          </span>
+          <span className="text-xs text-gray-500 hidden sm:table-cell">{formatDate(info.getValue())}</span>
         ),
         size: 100,
         minSize: 80,
@@ -233,9 +198,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   }}
                   onClick={h.column.getToggleSortingHandler()}
                   className={`px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider ${
-                    h.column.getCanSort()
-                      ? "cursor-pointer select-none hover:bg-gray-100 transition-colors"
-                      : ""
+                    h.column.getCanSort() ? "cursor-pointer select-none hover:bg-gray-100 transition-colors" : ""
                   } ${h.id === "lastUpdated" ? "hidden sm:table-cell" : ""}`}
                 >
                   <div className="flex items-center group">
@@ -259,10 +222,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {table.getRowModel().rows.map((row) => (
-            <tr
-              key={row.id}
-              className="hover:bg-gray-50/75 transition-colors duration-100"
-            >
+            <tr key={row.id} className="hover:bg-gray-50/75 transition-colors duration-100">
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}
@@ -272,9 +232,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     maxWidth: cell.column.columnDef.maxSize,
                   }}
                   className={`px-2 sm:px-3 py-2 whitespace-nowrap text-xs sm:text-sm ${
-                    cell.column.id === "lastUpdated"
-                      ? "hidden sm:table-cell"
-                      : ""
+                    cell.column.id === "lastUpdated" ? "hidden sm:table-cell" : ""
                   }`}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

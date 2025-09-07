@@ -144,3 +144,9 @@ export interface CustomInputFieldProps {
   rows?: number;
   required?: boolean;
 }
+
+export interface ProductTableProps {
+  products: Product[];
+  onEdit: (product: Product) => void;
+  onDelete: (product: Product) => void;
+}

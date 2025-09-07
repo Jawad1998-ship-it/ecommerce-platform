@@ -4,8 +4,7 @@ import axios from "axios";
 import { useState, useCallback } from "react";
 
 const useAxios = () => {
-  const baseURL =
-    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
   if (!baseURL) {
     console.error("BASE URL is not defined. Please check your host.");
   }
@@ -34,9 +33,9 @@ const useAxios = () => {
       // ) {
       //   return Promise.reject(error);
       // }
-      // Check if the error is a 455 and the request hasn't been retried yet
+      // Check if the error is a 401 and the request hasn't been retried yet
       if (
-        error.response?.status === 455 &&
+        error.response?.status === 401 &&
         !originalRequest._retry &&
         error.response?.data?.message !== "No refresh token provided"
       ) {
@@ -45,7 +44,7 @@ const useAxios = () => {
         try {
           // Call the refresh-token endpoint
           await axiosInstance.post("/refresh-token");
-          
+
           // Retry the original request with the new access token
           return axiosInstance(originalRequest);
         } catch (refreshError) {
@@ -75,8 +74,7 @@ const useAxios = () => {
         });
         return response;
       } catch (err) {
-        const errorMessage =
-          err.response?.data?.message || "An unknown error occurred";
+        const errorMessage = err.response?.data?.message || "An unknown error occurred";
         setError(errorMessage);
         throw err;
       } finally {
@@ -87,22 +85,10 @@ const useAxios = () => {
   );
 
   // HTTP methods
-  const get = useCallback(
-    (url, config) => fetchData("GET", url, null, config),
-    [fetchData]
-  );
-  const post = useCallback(
-    (url, data, config) => fetchData("POST", url, data, config),
-    [fetchData]
-  );
-  const put = useCallback(
-    (url, data, config) => fetchData("PUT", url, data, config),
-    [fetchData]
-  );
-  const del = useCallback(
-    (url, config) => fetchData("DELETE", url, null, config),
-    [fetchData]
-  );
+  const get = useCallback((url, config) => fetchData("GET", url, null, config), [fetchData]);
+  const post = useCallback((url, data, config) => fetchData("POST", url, data, config), [fetchData]);
+  const put = useCallback((url, data, config) => fetchData("PUT", url, data, config), [fetchData]);
+  const del = useCallback((url, config) => fetchData("DELETE", url, null, config), [fetchData]);
 
   return { get, post, put, del, loading, error };
 };

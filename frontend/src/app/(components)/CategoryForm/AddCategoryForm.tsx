@@ -112,7 +112,7 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
               type="text"
               name="name"
               placeholder="e.g., Watches, Shirts"
-              className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:focus:ring-sky-400 dark:focus:border-sky-400 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
             />
             <ErrorMessage name="name" component="p" className="text-red-500 text-xs" />
           </div>
@@ -126,7 +126,7 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
               name="description"
               rows={3}
               placeholder="Enter category description"
-              className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:focus:ring-sky-400 dark:focus:border-sky-400 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
             />
             <ErrorMessage name="description" component="p" className="text-red-500 text-xs" />
           </div>
@@ -158,7 +158,7 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                       <Field
                         name={`allowedUsers[${index}]`}
                         placeholder={`Enter email ${index + 1}`}
-                        className="flex-1 px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:focus:ring-sky-400 dark:focus:border-sky-400 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
+                        className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
                       />
                       <button
                         type="button"
@@ -212,7 +212,7 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                         <Field
                           name={`attributes[${index}].name`}
                           placeholder="e.g., Color, Size, Model"
-                          className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:focus:ring-sky-400 dark:focus:border-sky-400 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
+                          className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700"
                         />
                         <ErrorMessage
                           name={`attributes[${index}].name`}
@@ -228,7 +228,7 @@ const AddCategoryForm: React.FC<CategoryFormProps> = ({ theme }) => {
                         <Field
                           as="select"
                           name={`attributes[${index}].type`}
-                          className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:focus:ring-sky-400 dark:focus:border-sky-400 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700"
+                          className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-150 shadow-sm hover:shadow-md text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700"
                         >
                           <option value="text">Text</option>
                           <option value="number">Number</option>

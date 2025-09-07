@@ -19,9 +19,7 @@ const checkoutValidationSchema = Yup.object({
   city: Yup.string().required("Town / City is required"),
   country: Yup.string().required("Country is required"),
   phone: Yup.string().required("Phone number is required"),
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
+  email: Yup.string().email("Invalid email address").required("Email is required"),
   orderNotes: Yup.string(),
   paymentMethod: Yup.string()
     .oneOf(["cod", "sslcommerz"], "Please select a valid payment method")
@@ -44,11 +42,7 @@ const OrderDetails = () => {
     const fetchCountries = async () => {
       try {
         const response = await get("/countries");
-        setCountries(
-          Array?.isArray(response?.data?.data?.countries)
-            ? response?.data?.data?.countries
-            : []
-        );
+        setCountries(Array?.isArray(response?.data?.data?.countries) ? response?.data?.data?.countries : []);
       } catch (error) {
         console.error("Failed to fetch countries:", error);
         toast.error("Failed to load countries", {
@@ -66,20 +60,14 @@ const OrderDetails = () => {
 
   // Calculate subtotal dynamically
   const itemsSubtotal = cartItems
-    .reduce(
-      (total, item) =>
-        total + parseFloat(item?.product?.price || 0) * item.quantity,
-      0
-    )
+    .reduce((total, item) => total + parseFloat(item?.product?.price || 0) * item.quantity, 0)
     .toFixed(2);
 
   // Get shipping rate for selected country
   const selectedCountryData = Array?.isArray(countries)
     ? countries?.find((country) => country?.country_name === selectedCountry)
     : null;
-  const shippingRate = selectedCountryData
-    ? parseFloat(selectedCountryData?.shipping_rate?.toString()) || 5.0
-    : 5.0;
+  const shippingRate = selectedCountryData ? parseFloat(selectedCountryData?.shipping_rate?.toString()) || 5.0 : 5.0;
 
   const order = {
     items: cartItems,
@@ -88,9 +76,7 @@ const OrderDetails = () => {
       shipping: shippingRate,
     },
   };
-  const grandTotal = (
-    order.summary.itemsSubtotal + order.summary.shipping
-  ).toFixed(2);
+  const grandTotal = (order.summary.itemsSubtotal + order.summary.shipping).toFixed(2);
 
   const handleSSLCommerzPayment = async (orderData, customerData) => {
     try {
@@ -181,14 +167,11 @@ const OrderDetails = () => {
         });
       }
     } catch (error) {
-      toast.error(
-        error?.response?.data?.data?.error || "Failed to place order",
-        {
-          position: "top-right",
-          autoClose: 1000,
-          theme: "light",
-        }
-      );
+      toast.error(error?.response?.data?.data?.error || "Failed to place order", {
+        position: "top-right",
+        autoClose: 1000,
+        theme: "light",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -219,16 +202,11 @@ const OrderDetails = () => {
               <Form className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Left Side: Billing and Notes */}
                 <div>
-                  <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
-                    Billing details
-                  </h2>
+                  <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Billing details</h2>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label
-                          htmlFor="firstName"
-                          className="block font-medium mb-2 text-sm"
-                        >
+                        <label htmlFor="firstName" className="block font-medium mb-2 text-sm">
                           First name <span className="text-red-600">*</span>
                         </label>
                         <Field
@@ -237,17 +215,10 @@ const OrderDetails = () => {
                           name="firstName"
                           className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
                         />
-                        <ErrorMessage
-                          name="firstName"
-                          component="p"
-                          className="text-red-500 text-xs mt-1"
-                        />
+                        <ErrorMessage name="firstName" component="p" className="text-red-500 text-xs mt-1" />
                       </div>
                       <div>
-                        <label
-                          htmlFor="lastName"
-                          className="block font-medium mb-2 text-sm"
-                        >
+                        <label htmlFor="lastName" className="block font-medium mb-2 text-sm">
                           Last name <span className="text-red-600">*</span>
                         </label>
                         <Field
@@ -256,18 +227,11 @@ const OrderDetails = () => {
                           name="lastName"
                           className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
                         />
-                        <ErrorMessage
-                          name="lastName"
-                          component="p"
-                          className="text-red-500 text-xs mt-1"
-                        />
+                        <ErrorMessage name="lastName" component="p" className="text-red-500 text-xs mt-1" />
                       </div>
                     </div>
                     <div>
-                      <label
-                        htmlFor="country"
-                        className="block font-medium mb-2 text-sm"
-                      >
+                      <label htmlFor="country" className="block font-medium mb-2 text-sm">
                         Country <span className="text-red-600">*</span>
                       </label>
                       <Field
@@ -283,25 +247,15 @@ const OrderDetails = () => {
                       >
                         <option value="">Select Country</option>
                         {countries?.map((country) => (
-                          <option
-                            key={country?._id || country?.country_name}
-                            value={country?.country_name}
-                          >
+                          <option key={country?._id || country?.country_name} value={country?.country_name}>
                             {country?.country_name}
                           </option>
                         ))}
                       </Field>
-                      <ErrorMessage
-                        name="country"
-                        component="p"
-                        className="text-red-500 text-xs mt-1"
-                      />
+                      <ErrorMessage name="country" component="p" className="text-red-500 text-xs mt-1" />
                     </div>
                     <div>
-                      <label
-                        htmlFor="city"
-                        className="block font-medium mb-2 text-sm"
-                      >
+                      <label htmlFor="city" className="block font-medium mb-2 text-sm">
                         Town / City <span className="text-red-600">*</span>
                       </label>
                       <Field
@@ -310,17 +264,10 @@ const OrderDetails = () => {
                         name="city"
                         className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
                       />
-                      <ErrorMessage
-                        name="city"
-                        component="p"
-                        className="text-red-500 text-xs mt-1"
-                      />
+                      <ErrorMessage name="city" component="p" className="text-red-500 text-xs mt-1" />
                     </div>
                     <div>
-                      <label
-                        htmlFor="address"
-                        className="block font-medium mb-2 text-sm"
-                      >
+                      <label htmlFor="address" className="block font-medium mb-2 text-sm">
                         Street address <span className="text-red-600">*</span>
                       </label>
                       <Field
@@ -330,17 +277,10 @@ const OrderDetails = () => {
                         placeholder="House number and street name"
                         className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
                       />
-                      <ErrorMessage
-                        name="address"
-                        component="p"
-                        className="text-red-500 text-xs mt-1"
-                      />
+                      <ErrorMessage name="address" component="p" className="text-red-500 text-xs mt-1" />
                     </div>
                     <div>
-                      <label
-                        htmlFor="phone"
-                        className="block font-medium mb-2 text-sm"
-                      >
+                      <label htmlFor="phone" className="block font-medium mb-2 text-sm">
                         Phone <span className="text-red-600">*</span>
                       </label>
                       <Field
@@ -349,17 +289,10 @@ const OrderDetails = () => {
                         name="phone"
                         className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
                       />
-                      <ErrorMessage
-                        name="phone"
-                        component="p"
-                        className="text-red-500 text-xs mt-1"
-                      />
+                      <ErrorMessage name="phone" component="p" className="text-red-500 text-xs mt-1" />
                     </div>
                     <div>
-                      <label
-                        htmlFor="email"
-                        className="block font-medium mb-2 text-sm"
-                      >
+                      <label htmlFor="email" className="block font-medium mb-2 text-sm">
                         Email address <span className="text-red-600">*</span>
                       </label>
                       <Field
@@ -368,20 +301,11 @@ const OrderDetails = () => {
                         name="email"
                         className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
                       />
-                      <ErrorMessage
-                        name="email"
-                        component="p"
-                        className="text-red-500 text-xs mt-1"
-                      />
+                      <ErrorMessage name="email" component="p" className="text-red-500 text-xs mt-1" />
                     </div>
-                    <h2 className="text-2xl font-bold pt-8 text-gray-800 dark:text-white">
-                      Additional information
-                    </h2>
+                    <h2 className="text-2xl font-bold pt-8 text-gray-800 dark:text-white">Additional information</h2>
                     <div>
-                      <label
-                        htmlFor="orderNotes"
-                        className="block font-medium mb-2 text-sm"
-                      >
+                      <label htmlFor="orderNotes" className="block font-medium mb-2 text-sm">
                         Order notes (optional)
                       </label>
                       <Field
@@ -399,9 +323,7 @@ const OrderDetails = () => {
                 {/* Right Side: Order Summary & Payment */}
                 <div>
                   <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
-                      Your order
-                    </h2>
+                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Your order</h2>
                     <div className="space-y-4">
                       <div className="flex justify-between font-semibold border-b border-gray-200 dark:border-gray-700 pb-2">
                         <span>Product</span>
@@ -415,13 +337,7 @@ const OrderDetails = () => {
                           <span>
                             {item?.product?.name} × {item?.quantity}
                           </span>
-                          <span>
-                            $
-                            {(
-                              parseFloat(item?.product?.price || 0) *
-                              item?.quantity
-                            ).toFixed(2)}
-                          </span>
+                          <span>${(parseFloat(item?.product?.price || 0) * item?.quantity).toFixed(2)}</span>
                         </div>
                       ))}
                       <div className="flex justify-between font-semibold">
@@ -453,9 +369,7 @@ const OrderDetails = () => {
                               value="cod"
                               className="mr-4 h-4 w-4 focus:ring-blue-500 text-blue-600 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
                             />
-                            <span className="font-semibold">
-                              Cash on delivery
-                            </span>
+                            <span className="font-semibold">Cash on delivery</span>
                           </label>
                           {values.paymentMethod === "cod" && (
                             <div className="p-4 mt-2 text-sm bg-gray-100 dark:bg-gray-800 rounded-md">
@@ -477,33 +391,22 @@ const OrderDetails = () => {
                               value="sslcommerz"
                               className="mr-4 h-4 w-4 focus:ring-blue-500 text-blue-600 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
                             />
-                            <span className="font-semibold">
-                              Credit/Debit Card & Mobile Banking
-                            </span>
+                            <span className="font-semibold">Credit/Debit Card & Mobile Banking</span>
                             <CreditCard className="ml-auto text-gray-500 dark:text-gray-400" />
                           </label>
                           {values.paymentMethod === "sslcommerz" && (
                             <div className="p-4 mt-2 text-sm bg-gray-100 dark:bg-gray-800 rounded-md">
-                              Pay securely with credit card, debit card, or
-                              mobile banking via SSLCommerz.
+                              Pay securely with credit card, debit card, or mobile banking via SSLCommerz.
                             </div>
                           )}
                         </li>
                       </ul>
-                      <ErrorMessage
-                        name="paymentMethod"
-                        component="p"
-                        className="text-red-500 text-xs mt-1"
-                      />
+                      <ErrorMessage name="paymentMethod" component="p" className="text-red-500 text-xs mt-1" />
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-200 mt-6">
-                      Your personal data will be used to process your order,
-                      support your experience throughout this website, and for
-                      other purposes described in our{" "}
-                      <Link
-                        href="#"
-                        className="font-semibold text-blue-400 hover:underline"
-                      >
+                      Your personal data will be used to process your order, support your experience throughout this
+                      website, and for other purposes described in our{" "}
+                      <Link href="#" className="font-semibold text-blue-400 hover:underline">
                         privacy policy
                       </Link>
                       .
@@ -512,9 +415,7 @@ const OrderDetails = () => {
                       type="submit"
                       disabled={isSubmitting || cartItems.length === 0}
                       className={`w-full mt-6 bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-3 px-4 rounded-lg shadow-sm flex items-center justify-center transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed ${
-                        isSubmitting || cartItems.length === 0
-                          ? "opacity-50"
-                          : ""
+                        isSubmitting || cartItems.length === 0 ? "opacity-50" : ""
                       }`}
                     >
                       <Lock size={16} className="mr-2" />

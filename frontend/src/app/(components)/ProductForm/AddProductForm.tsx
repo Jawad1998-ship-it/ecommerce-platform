@@ -9,13 +9,12 @@ import useAxios from "../../../context/axiosContext";
 import Select from "react-select";
 import { AddProductFormProps, Category, Product } from "@/types/types";
 import { ProductSubmitIcon } from "../Icons/Icons";
+import { capitalize } from "@/utils/utils";
 
 const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
   const { post, loading, get } = useAxios();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -38,15 +37,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
       category: Yup.string().required("Category is required"),
       name: Yup.string().required("Product name is required"),
       description: Yup.string().required("Description is required"),
-      price: Yup.number()
-        .required("Price is required")
-        .positive("Price must be positive"),
+      price: Yup.number().required("Price is required").positive("Price must be positive"),
       originalPrice: Yup.number()
         .positive("Original price must be positive")
-        .moreThan(
-          Yup.ref("price"),
-          "Original price must be greater than current price"
-        )
+        .moreThan(Yup.ref("price"), "Original price must be greater than current price")
         .nullable(),
       brand: Yup.string().required("Brand is required"),
       features: Yup.array()
@@ -65,18 +59,12 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         .test("non-empty", "At least one attribute is required", (value) => {
           return value && Object.keys(value).length > 0;
         })
-        .test(
-          "valid-values",
-          "Attribute values must be strings or string arrays",
-          (value) => {
-            if (!value) return false;
-            return Object.values(value).every((val) =>
-              Array.isArray(val)
-                ? val.every((item) => typeof item === "string")
-                : typeof val === "string"
-            );
-          }
-        ),
+        .test("valid-values", "Attribute values must be strings or string arrays", (value) => {
+          if (!value) return false;
+          return Object.values(value).every((val) =>
+            Array.isArray(val) ? val.every((item) => typeof item === "string") : typeof val === "string"
+          );
+        }),
     };
 
     // Dynamic validation for category-specific attributes
@@ -94,9 +82,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                 .min(1, `At least one ${attr.name} must be selected`)
                 .required(`${attr.name} is required`);
             } else {
-              acc[attr.name] = Yup.string().required(
-                `${attr.name} is required`
-              );
+              acc[attr.name] = Yup.string().required(`${attr.name} is required`);
             }
           }
           return acc;
@@ -120,21 +106,16 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     attributes: {},
   };
 
-  const uploadSingleFile = async (
-    file: File
-  ): Promise<{ url: string; publicId: string } | null> => {
+  const uploadSingleFile = async (file: File): Promise<{ url: string; publicId: string } | null> => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "upload");
 
     try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/db3dox65k/image/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(`https://api.cloudinary.com/v1_1/db3dox65k/image/upload`, {
+        method: "POST",
+        body: formData,
+      });
 
       if (!response.ok) {
         throw new Error("Upload failed");
@@ -190,9 +171,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         ...values,
         imageFiles: uploadedImages,
         price: parseFloat(values.price.toString()),
-        originalPrice: values.originalPrice
-          ? parseFloat(values.originalPrice.toString())
-          : null,
+        originalPrice: values.originalPrice ? parseFloat(values.originalPrice.toString()) : null,
         attributes: values.attributes, // Send attributes as-is (object)
       };
 
@@ -214,19 +193,13 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     }
   };
 
-  const capitalize = (str: string) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
-
   // Custom styles for react-select to match form styling
   const customSelectStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
       backgroundColor: theme === "dark" ? "#374151" : "#ffffff",
       borderColor: theme === "dark" ? "#4b5563" : "#d1d5db",
-      boxShadow: state.isFocused
-        ? "0 0 0 2px #3b82f6"
-        : "0 1px 2px rgba(0, 0, 0, 0.05)",
+      boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "0 1px 2px rgba(0, 0, 0, 0.05)",
       borderRadius: "0.5rem",
       padding: "0.5rem",
       "&:hover": {
@@ -241,16 +214,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     }),
     option: (provided: any, state: any) => ({
       ...provided,
-      backgroundColor: state.isSelected
-        ? "#3b82f6"
-        : theme === "dark"
-        ? "#374151"
-        : "#ffffff",
-      color: state.isSelected
-        ? "#ffffff"
-        : theme === "dark"
-        ? "#ffffff"
-        : "#1f2937",
+      backgroundColor: state.isSelected ? "#3b82f6" : theme === "dark" ? "#374151" : "#ffffff",
+      color: state.isSelected ? "#ffffff" : theme === "dark" ? "#ffffff" : "#1f2937",
       "&:hover": {
         backgroundColor: theme === "dark" ? "#4b5563" : "#f3f4f6",
       },
@@ -293,10 +258,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
         <Form className={`space-y-6 ${theme} p-4 rounded-lg shadow-lg`}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label
-                htmlFor="category"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
+              <label htmlFor="category" className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm">
                 Category <span className="text-red-500">*</span>
               </label>
               <Field
@@ -306,9 +268,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                   const categoryId = e.target.value;
                   setFieldValue("category", categoryId);
-                  const selected = categories.find(
-                    (cat) => cat._id === categoryId
-                  );
+                  const selected = categories.find((cat) => cat._id === categoryId);
                   setSelectedCategory(selected || null);
                   setFieldValue("attributes", {});
                 }}
@@ -320,18 +280,11 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                   </option>
                 ))}
               </Field>
-              <ErrorMessage
-                name="category"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
+              <ErrorMessage name="category" component="p" className="text-red-500 text-xs mt-1" />
             </div>
 
             <div>
-              <label
-                htmlFor="name"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
+              <label htmlFor="name" className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm">
                 Product Name <span className="text-red-500">*</span>
               </label>
               <Field
@@ -340,18 +293,11 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                 placeholder="Enter product name"
                 className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
               />
-              <ErrorMessage
-                name="name"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
+              <ErrorMessage name="name" component="p" className="text-red-500 text-xs mt-1" />
             </div>
 
             <div>
-              <label
-                htmlFor="price"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
+              <label htmlFor="price" className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm">
                 Price <span className="text-red-500">*</span>
               </label>
               <Field
@@ -361,11 +307,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                 placeholder="Enter price"
                 className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
               />
-              <ErrorMessage
-                name="price"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
+              <ErrorMessage name="price" component="p" className="text-red-500 text-xs mt-1" />
             </div>
 
             <div>
@@ -382,18 +324,11 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                 placeholder="Enter original price"
                 className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
               />
-              <ErrorMessage
-                name="originalPrice"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
+              <ErrorMessage name="originalPrice" component="p" className="text-red-500 text-xs mt-1" />
             </div>
 
             <div>
-              <label
-                htmlFor="brand"
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-              >
+              <label htmlFor="brand" className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm">
                 Brand <span className="text-red-500">*</span>
               </label>
               <Field
@@ -402,11 +337,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                 placeholder="Enter brand"
                 className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
               />
-              <ErrorMessage
-                name="brand"
-                component="p"
-                className="text-red-500 text-xs mt-1"
-              />
+              <ErrorMessage name="brand" component="p" className="text-red-500 text-xs mt-1" />
             </div>
 
             {selectedCategory?.attributes?.map((attr, index) => (
@@ -434,9 +365,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                         styles={customSelectStyles}
                         placeholder={`Select ${capitalize(attr.name)}`}
                         onChange={(selectedOptions) => {
-                          const values = selectedOptions
-                            ? selectedOptions.map((option: any) => option.value)
-                            : [];
+                          const values = selectedOptions ? selectedOptions.map((option: any) => option.value) : [];
                           form.setFieldValue(field.name, values);
                         }}
                         value={field.value?.map((val: string) => ({
@@ -454,20 +383,13 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                     className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors text-sm"
                   />
                 )}
-                <ErrorMessage
-                  name={`attributes[${attr.name}]`}
-                  component="p"
-                  className="text-red-500 text-xs mt-1"
-                />
+                <ErrorMessage name={`attributes[${attr.name}]`} component="p" className="text-red-500 text-xs mt-1" />
               </div>
             ))}
           </div>
 
           <div>
-            <label
-              htmlFor="description"
-              className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm"
-            >
+            <label htmlFor="description" className="block text-gray-700 dark:text-gray-300 font-medium mb-2 text-sm">
               Description <span className="text-red-500">*</span>
             </label>
             <Field
@@ -477,11 +399,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
               placeholder="Enter product description"
               className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition text-sm"
             />
-            <ErrorMessage
-              name="description"
-              component="p"
-              className="text-red-500 text-xs mt-1"
-            />
+            <ErrorMessage name="description" component="p" className="text-red-500 text-xs mt-1" />
           </div>
 
           <div>
@@ -516,11 +434,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
                   >
                     Add Feature
                   </button>
-                  <ErrorMessage
-                    name="features"
-                    component="p"
-                    className="text-red-500 text-xs mt-1"
-                  />
+                  <ErrorMessage name="features" component="p" className="text-red-500 text-xs mt-1" />
                 </div>
               )}
             </FieldArray>
@@ -536,11 +450,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
               maxFiles={10}
               maxFileSize={5}
             />
-            <ErrorMessage
-              name="imageFiles"
-              component="p"
-              className="text-red-500 text-xs mt-1"
-            />
+            <ErrorMessage name="imageFiles" component="p" className="text-red-500 text-xs mt-1" />
             {values.imageFiles.length > 0 && (
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 {values.imageFiles.length} image(s) selected
@@ -554,17 +464,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
               name="isInStock"
               className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500"
             />
-            <label
-              htmlFor="isInStock"
-              className="text-gray-700 dark:text-gray-300 font-medium text-sm"
-            >
+            <label htmlFor="isInStock" className="text-gray-700 dark:text-gray-300 font-medium text-sm">
               In Stock
             </label>
-            <ErrorMessage
-              name="isInStock"
-              component="p"
-              className="text-red-500 text-xs"
-            />
+            <ErrorMessage name="isInStock" component="p" className="text-red-500 text-xs" />
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">

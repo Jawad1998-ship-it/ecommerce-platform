@@ -58,7 +58,7 @@ export const protectedRoute = async (req, res, next) => {
     const accessToken = req.cookies.access_token;
     if (!accessToken) {
       return res
-        .status(455)
+        .status(401)
         .json({ message: "Unauthorized - No access token provided" });
     }
     try {
@@ -68,14 +68,14 @@ export const protectedRoute = async (req, res, next) => {
       );
       const user = await User.findById(decoded.userId).select("-password");
       if (!user) {
-        return res.status(403).json({ message: "User not found" });
+        return res.status(401).json({ message: "User not found" });
       }
       req.user = user;
       next();
     } catch (error) {
       if (error.name === "TokenExpiredError") {
         return res
-          .status(403)
+          .status(401)
           .json({ message: "Unauthorized - Access token has expired" });
       }
       throw error;
