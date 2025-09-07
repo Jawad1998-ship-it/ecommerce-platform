@@ -3,43 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, FieldArray, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { NextRouter } from "next/router";
 import ProductImageUpload from "../../(dashboard)/business/products/ProductImageUpload";
 import { toast } from "react-toastify";
 import useAxios from "../../../context/axiosContext";
 import Select from "react-select";
-
-interface Attribute {
-  name: string;
-  type: "text" | "number" | "select";
-  required: boolean;
-  options?: string[];
-}
-
-interface Category {
-  _id: string;
-  name: string;
-  attributes: Attribute[];
-}
-
-interface ProductFormData {
-  id?: string;
-  category: string;
-  name: string;
-  description: string;
-  price: number | string;
-  originalPrice?: number | string;
-  brand: string;
-  features: string[];
-  imageFiles: { file: File }[];
-  isInStock: boolean;
-  attributes: { [key: string]: string | string[] };
-}
-
-interface AddProductFormProps {
-  theme: string;
-  router: NextRouter;
-}
+import { AddProductFormProps, Category, Product } from "@/types/types";
+import { ProductSubmitIcon } from "../Icons/Icons";
 
 const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
   const { post, loading, get } = useAxios();
@@ -64,7 +33,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     fetchCategories();
   }, []);
 
-  const getValidationSchema = () => {
+  const productValidationSchema = () => {
     const schema = {
       category: Yup.string().required("Category is required"),
       name: Yup.string().required("Product name is required"),
@@ -138,7 +107,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     return Yup.object(schema);
   };
 
-  const initialValues: ProductFormData = {
+  const initialValues: Product = {
     category: "",
     name: "",
     description: "",
@@ -183,10 +152,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
     }
   };
 
-  const handleSubmit = async (
-    values: ProductFormData,
-    { setSubmitting }: any
-  ) => {
+  const handleSubmit = async (values: Product, { setSubmitting }: any) => {
     try {
       if (!values.imageFiles || values.imageFiles.length === 0) {
         toast.error("Please upload at least one product image");
@@ -318,7 +284,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={getValidationSchema()}
+      validationSchema={productValidationSchema()}
       onSubmit={handleSubmit}
       validateOnChange={false}
       validateOnBlur={false}
@@ -617,27 +583,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
             >
               {isSubmitting ? (
                 <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  <span>Creating Product...</span>
+                  <ProductSubmitIcon /> <span>Creating Product...</span>
                 </>
               ) : (
                 <span>Add Product</span>

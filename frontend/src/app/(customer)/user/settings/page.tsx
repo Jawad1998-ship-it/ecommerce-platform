@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage, FormikProps } from "formik";
 import { useTheme } from "next-themes";
 import { useAppSelector, useAppDispatch } from "@/app/redux";

@@ -1,12 +1,11 @@
+import { NextRouter } from "next/router";
+
 export interface ThemeState {
   theme: string;
 }
 
 export interface AxiosContextReturn {
-  post: (
-    url: string,
-    data?: object
-  ) => Promise;
+  post: (url: string, data?: object) => Promise;
   loading: boolean;
 }
 
@@ -36,6 +35,24 @@ export interface UserState {
   currentUser: User | null;
 }
 
+export interface Attribute {
+  name: string;
+  type: "text" | "number" | "select";
+  required: boolean;
+  options?: string[];
+}
+
+export interface Category {
+  _id: string;
+  name: string;
+  attributes: Attribute[];
+}
+
+export interface AddProductFormProps {
+  theme: string;
+  router: NextRouter;
+}
+
 export interface Product {
   _id: string;
   name: string;
@@ -55,14 +72,29 @@ export interface Product {
   updatedAt?: string;
 }
 
+export interface SearchResponse {
+  products: Product[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+  searchInfo: {
+    query: string;
+    category: string;
+    resultsCount: number;
+  };
+}
+
 export interface ProductDetailsSectionProps {
   product: Product;
   totalRatings: number;
   ratingDistribution: number[];
   isTryOnOpen: boolean;
-  setIsTryOnOpen: (
-    isOpen: boolean
-  ) => void;
+  setIsTryOnOpen: (isOpen: boolean) => void;
 }
 
 export interface CartItem {
