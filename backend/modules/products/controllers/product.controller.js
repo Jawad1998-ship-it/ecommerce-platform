@@ -6,6 +6,8 @@ import cloudinary from "../../../lib/cloudinary.js";
 import Product from "../models/product.model.js";
 
 export const createProduct = async (req, res) => {
+  console.log("this", req.body);
+  return;
   try {
     const {
       category,
@@ -411,7 +413,7 @@ export const getProduct = async (req, res) => {
 
 export const findAllProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({}).populate("category");
     successResponse(
       200,
       "SUCCESS",
@@ -605,7 +607,7 @@ export const searchProducts = async (req, res) => {
     const { query, category, page = 1, limit = 20 } = req.query;
 
     // Validate search query
-    if (!query || query.trim() === '') {
+    if (!query || query.trim() === "") {
       return errorResponse(
         400,
         "VALIDATION_ERROR",
@@ -625,25 +627,25 @@ export const searchProducts = async (req, res) => {
     };
 
     // Category filter
-    if (category && category !== 'all') {
+    if (category && category !== "all") {
       searchCriteria.category = category;
     }
 
     // Create text search conditions
     const textSearchConditions = [
-      { name: { $regex: searchTerm, $options: 'i' } },
-      { description: { $regex: searchTerm, $options: 'i' } },
-      { brand: { $regex: searchTerm, $options: 'i' } },
-      { category: { $regex: searchTerm, $options: 'i' } },
-      { category_name: { $regex: searchTerm, $options: 'i' } },
-      { features: { $elemMatch: { $regex: searchTerm, $options: 'i' } } },
+      { name: { $regex: searchTerm, $options: "i" } },
+      { description: { $regex: searchTerm, $options: "i" } },
+      { brand: { $regex: searchTerm, $options: "i" } },
+      { category: { $regex: searchTerm, $options: "i" } },
+      { category_name: { $regex: searchTerm, $options: "i" } },
+      { features: { $elemMatch: { $regex: searchTerm, $options: "i" } } },
     ];
 
     // Add attributes search for common attribute keys
-    const commonAttributes = ['color', 'size', 'material', 'type', 'style'];
-    commonAttributes.forEach(attr => {
+    const commonAttributes = ["color", "size", "material", "type", "style"];
+    commonAttributes.forEach((attr) => {
       textSearchConditions.push({
-        [`attributes.${attr}`]: { $regex: searchTerm, $options: 'i' }
+        [`attributes.${attr}`]: { $regex: searchTerm, $options: "i" },
       });
     });
 
@@ -653,12 +655,12 @@ export const searchProducts = async (req, res) => {
     // Execute search with pagination
     const [products, totalCount] = await Promise.all([
       Product.find(searchCriteria)
-        .select('-cloudinaryPublicIds')
+        .select("-cloudinaryPublicIds")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum)
         .lean(),
-      Product.countDocuments(searchCriteria)
+      Product.countDocuments(searchCriteria),
     ]);
 
     // Calculate pagination info
@@ -677,17 +679,16 @@ export const searchProducts = async (req, res) => {
           totalItems: totalCount,
           itemsPerPage: limitNum,
           hasNextPage,
-          hasPrevPage
+          hasPrevPage,
         },
         searchInfo: {
           query: searchTerm,
-          category: category || 'all',
-          resultsCount: products.length
-        }
+          category: category || "all",
+          resultsCount: products.length,
+        },
       },
       res
     );
-
   } catch (error) {
     console.error("Search error:", error);
     errorResponse(
@@ -712,4 +713,3 @@ async function updateFeaturedProductsCache() {
     );
   }
 }
-

@@ -55,18 +55,19 @@ export interface AddProductFormProps {
 
 export interface Product {
   _id: string;
+  category: Category;
+  category_name: string;
   name: string;
   price: number;
   imageUrls: string[];
-  description?: string;
-  brand?: string;
-  category?: string;
-  features?: string[];
+  description: string;
+  brand: string;
+  features: string[];
   attributes?: {
     [key: string]: string | string[];
   };
   isInStock?: boolean;
-  originalPrice?: number;
+  originalPrice: number;
   cloudinaryPublicIds?: string[];
   createdAt?: string;
   updatedAt?: string;

@@ -26,6 +26,8 @@ const ProductSchema = new Schema(
     },
     originalPrice: {
       type: Number,
+      required: true,
+      min: [0, "Original Price cannot be negative"],
     },
     discountedPrice: {
       type: Number,

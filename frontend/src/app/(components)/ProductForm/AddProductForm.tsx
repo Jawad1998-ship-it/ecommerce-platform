@@ -35,12 +35,17 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
   const productValidationSchema = () => {
     const schema = {
       category: Yup.string().required("Category is required"),
+      category_name: Yup.string().required("Category name is required"),
       name: Yup.string().required("Product name is required"),
       description: Yup.string().required("Description is required"),
-      price: Yup.number().required("Price is required").positive("Price must be positive"),
+      price: Yup.number().required("Price is required").min(0, "Price must be non-negative"),
       originalPrice: Yup.number()
-        .positive("Original price must be positive")
-        .moreThan(Yup.ref("price"), "Original price must be greater than current price")
+        .required("Original price is required")
+        .min(0, "Original Price must be non-negative")
+        .moreThan(Yup.ref("price"), "Original price must be greater than current price"),
+      discountedPrice: Yup.number()
+        .positive("Discounted price must be positive")
+        .lessThan(Yup.ref("price"), "Discounted price must be less than current price")
         .nullable(),
       brand: Yup.string().required("Brand is required"),
       features: Yup.array()
@@ -95,15 +100,17 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
 
   const initialValues: Product = {
     category: "",
+    category_name: "",
     name: "",
     description: "",
     price: "",
     originalPrice: "",
     brand: "",
-    features: [""],
+    features: [],
     imageFiles: [],
     isInStock: true,
     attributes: {},
+    cloudinaryPublicIds: [],
   };
 
   const uploadSingleFile = async (file: File): Promise<{ url: string; publicId: string } | null> => {
@@ -169,6 +176,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
 
       const productData = {
         ...values,
+        category_name: selectedCategory?.name || "",
         imageFiles: uploadedImages,
         price: parseFloat(values.price.toString()),
         originalPrice: values.originalPrice ? parseFloat(values.originalPrice.toString()) : null,
@@ -245,7 +253,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ theme, router }) => {
       color: theme === "dark" ? "#ffffff" : "#1f2937",
     }),
   };
-
+  console.log(selectedCategory?.name);
   return (
     <Formik
       initialValues={initialValues}

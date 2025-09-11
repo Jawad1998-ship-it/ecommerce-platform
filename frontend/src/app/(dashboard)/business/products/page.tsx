@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { EditIcon } from "@/app/(components)/Icons/Icons";
-import { Product } from "@/types/types";
+import { Product, Category } from "@/types/types";
 import useAxios from "@/context/axiosContext";
 import { toast } from "react-toastify";
 import Loading from "@/app/loading";
@@ -16,6 +16,8 @@ const ProductsPage = () => {
   const { get } = useAxios();
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
 
   const columns = useMemo(
@@ -23,22 +25,30 @@ const ProductsPage = () => {
       columnHelper.accessor("name", {
         header: "Product Name",
         cell: (info) => (
-          <span className="font-medium">
+          <div className="flex items-center gap-3">
             <Image
               src={info?.row?.original?.imageUrls[0] || "/images/placeholder.jpg"}
               alt={info?.row?.original?.name}
               width={60}
               height={60}
               priority
-              className="object-cover"
+              className="object-cover rounded-md"
             />
-            {info.getValue()}
-          </span>
+            <span className="font-medium">{info.getValue()}</span>
+          </div>
         ),
       }),
       columnHelper.accessor("brand", {
         header: "Brand",
         cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor((row) => row.category?.name, {
+        id: "category",
+        header: "Category",
+        cell: (info) => {
+          console.log(info);
+          return <div>{info.getValue() || "N/A"}</div>;
+        },
       }),
       columnHelper.accessor("price", {
         header: "Price",
@@ -58,7 +68,7 @@ const ProductsPage = () => {
           </span>
         ),
       }),
-      columnHelper.accessor("id", {
+      columnHelper.accessor("_id", {
         header: "Actions",
         cell: (info) => (
           <button
@@ -85,17 +95,42 @@ const ProductsPage = () => {
         autoClose: 2000,
         theme: "light",
       });
-    } finally {
-      setIsLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await get(`/categories/all-categories`);
+      setCategories(response?.data?.data?.categories);
+      console.log(response);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      toast.error("Failed to load categories", {
+        position: "top-right",
+        autoClose: 2000,
+        theme: "light",
+      });
     }
   };
 
   useEffect(() => {
-    fetchProducts();
+    const loadData = async () => {
+      setIsLoading(true);
+      await Promise.all([fetchProducts(), fetchCategories()]);
+      setIsLoading(false);
+    };
+    loadData();
   }, []);
 
+  const filteredProducts = useMemo(() => {
+    if (!selectedCategory) {
+      return products;
+    }
+    return products.filter((product) => (product.category as Category)?._id === selectedCategory);
+  }, [products, selectedCategory]);
+
   const table = useReactTable({
-    data: products,
+    data: filteredProducts,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -108,17 +143,35 @@ const ProductsPage = () => {
     <Loading />
   ) : (
     <div className="max-w-7xl mx-auto p-4 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">Manage Products</h1>
-        <button
-          onClick={handleAddProduct}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-md shadow-sm transition-colors"
-        >
-          Add New Product
-        </button>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <select
+              id="category-filter"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+            >
+              <option value="">All Categories</option>
+              {categories?.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={handleAddProduct}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-md shadow-sm transition-colors"
+          >
+            Add New Product
+          </button>
+        </div>
       </div>
 
-      {products?.length === 0 ? (
+      {filteredProducts?.length === 0 ? (
         <div className="text-center py-10 bg-white dark:bg-gray-800 rounded-lg shadow">
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
@@ -136,7 +189,9 @@ const ProductsPage = () => {
             />
           </svg>
           <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No products</h3>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new product.</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {selectedCategory ? "No products found in this category." : "Get started by creating a new product."}
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto bg-white dark:bg-gray-800 shadow-md rounded-lg">
